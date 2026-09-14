@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/common :: head('My profile')}"></head>
+<body>
+<nav th:replace="~{fragments/common :: navbar}"></nav>
+<div th:replace="~{fragments/common :: flash}"></div>
+
+<section class="section">
+    <div class="container form-panel">
+        <div class="page-head"><h1>My profile</h1></div>
+
+        <!-- Raised when a notification could not be delivered to this account. -->
+        <div class="alert alert-danger" th:if="${user.contactUnreachable}">
+            We could not deliver a recent notification to you. Please check your email address and phone
+            number below and update anything that is out of date - bookings still work in the meantime.
+        </div>
+
+        <div class="card" style="margin-bottom:var(--space-4)">
+            <h3>Contact details</h3>
+            <form th:action="@{/customer/profile}" th:object="${profileForm}" method="post" novalidate>
+                <div class="field">
+                    <label for="fullName">Full name</label>
+                    <input class="input" id="fullName" type="text" th:field="*{fullName}"/>
+                    <div class="field-error" th:if="${#fields.hasErrors('fullName')}" th:errors="*{fullName}"></div>
+                </div>
+                <div class="field">
+                    <label>Email (login)</label>
+                    <input class="input" type="email" th:value="${user.email}" disabled/>
+                </div>
+                <div class="field">
+                    <label>Identity card number (NIC)</label>
+                    <input class="input" type="text" th:value="${user.identityCardNumber}" disabled/>
+                    <p class="muted" style="font-size:.8rem;margin:.35rem 0 0">Set at registration and cannot be changed.</p>
+                </div>
+                <div class="field">
+                    <label for="phone">Phone</label>
+                    <input class="input" id="phone" type="text" th:field="*{phone}"/>
+                    <div class="field-error" th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}"></div>
+                </div>
+                <button class="btn btn-primary" type="submit">Save changes</button>
+            </form>
+        </div>
+
+        <div class="card">
+            <h3>Change password</h3>
+            <form th:action="@{/customer/password}" method="post" novalidate>
+                <div class="field">
+                    <label for="currentPassword">Current password</label>
+                    <input class="input" id="currentPassword" name="currentPassword" type="password" required/>
+                </div>
+                <div class="form-row">
+                    <div class="field">
+                        <label for="newPassword">New password</label>
+                        <input class="input" id="newPassword" name="newPassword" type="password" required/>
+                    </div>
+                    <div class="field">
+                        <label for="confirmPassword">Confirm new password</label>
+                        <input class="input" id="confirmPassword" name="confirmPassword" type="password" required/>
+                    </div>
+                </div>
+                <button class="btn btn-dark" type="submit">Update password</button>
+            </form>
+        </div>
+
+        <div class="card" style="margin-top:var(--space-4)">
+            <h3>My documents</h3>
+            <p class="muted">
+                Copies kept on your account. Upload once and they are reused for owner or driver
+                registration instead of being asked for again.
+            </p>
+
+            <p class="muted" th:if="${#lists.isEmpty(documents)}">Nothing uploaded yet.</p>
+            <div class="table-wrap" th:unless="${#lists.isEmpty(documents)}">
+                <table class="data">
+                    <thead><tr><th>Type</th><th>File</th><th>Size</th><th>Uploaded</th><th></th></tr></thead>
+                    <tbody>
+                    <tr th:each="doc : ${documents}">
+                        <td th:text="${doc.type.displayName}">Type</td>
+                        <td th:text="${doc.originalFilename}">file.pdf</td>
+                        <td th:text="${doc.sizeLabel}">10 KB</td>
+                        <td th:text="${#temporals.format(doc.createdAt, 'dd MMM yyyy')}">date</td>
+                        <td><a class="btn btn-ghost btn-sm" th:href="@{'/documents/' + ${doc.id}}" target="_blank">View</a></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <form th:action="@{/customer/documents}" method="post" enctype="multipart/form-data"
+                  style="margin-top:var(--space-3)">
+                <div class="form-row">
+                    <div class="field">
+                        <label for="type">Document type</label>
+                        <select class="select" id="type" name="type">
+                            <option th:each="t : ${documentTypes}" th:value="${t}" th:text="${t.displayName}">Type</option>
+                        </select>
+                    </div>
+                    <div class="field">
+                        <label for="file">File (JPG, PNG or PDF, max 5&nbsp;MB)</label>
+                        <input class="input" id="file" type="file" name="file" required
+                               accept="image/jpeg,image/png,image/webp,application/pdf"/>
+                    </div>
+                </div>
+                <button class="btn btn-ghost" type="submit">Upload</button>
+            </form>
+        </div>
+    </div>
+</section>
+
+<footer th:replace="~{fragments/common :: footer}"></footer>
+</body>
+</html>

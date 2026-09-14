@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/common :: head('My dashboard')}"></head>
+<body>
+<nav th:replace="~{fragments/common :: navbar}"></nav>
+<div th:replace="~{fragments/common :: flash}"></div>
+
+<section class="section">
+    <div class="container">
+        <div class="page-head">
+            <div>
+                <p class="eyebrow">Customer</p>
+                <h1>Welcome, <span th:text="${user.fullName}">Customer</span></h1>
+            </div>
+            <a class="btn btn-primary" th:href="@{/machines}">Book a machine</a>
+        </div>
+
+        <div class="grid grid-4">
+            <a class="card card-hover" th:href="@{/machines}" style="text-decoration:none;color:inherit">
+                <h3>Browse machines</h3>
+                <p>Search available JCBs by type, location and date.</p>
+            </a>
+            <a class="card card-hover" th:href="@{/customer/bookings}" style="text-decoration:none;color:inherit">
+                <h3>My bookings</h3>
+                <p>Track the status of your booking requests and rentals.</p>
+            </a>
+            <a class="card card-hover" th:href="@{/customer/invoices}" style="text-decoration:none;color:inherit">
+                <h3>My invoices</h3>
+                <p>View invoices and pay online after your booking is approved.</p>
+            </a>
+            <a class="card card-hover" th:href="@{/customer/profile}" style="text-decoration:none;color:inherit">
+                <h3>My profile</h3>
+                <p>Update your contact details and password.</p>
+            </a>
+        </div>
+
+        <div class="alert alert-info" style="margin-top:var(--space-4)"
+             th:if="${unpaidCount != null and unpaidCount > 0}">
+            You have <strong th:text="${unpaidCount}">1</strong> unpaid invoice(s).
+            <a th:href="@{/customer/invoices}">Pay now</a> to confirm your rental — the invoice was sent to your email.
+        </div>
+    </div>
+</section>
+
+<footer th:replace="~{fragments/common :: footer}"></footer>
+</body>
+</html>
