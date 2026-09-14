@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/common :: head(${machine.model})}"></head>
+<body>
+<nav th:replace="~{fragments/common :: navbar}"></nav>
+
+<section class="section">
+    <div class="container">
+        <a class="muted" th:href="@{/machines}">&larr; Back to machines</a>
+        <div class="grid grid-2" style="margin-top:var(--space-3);align-items:start">
+            <div class="card">
+                <div class="machine-thumb" th:if="${machine.imageUrl == null or machine.imageUrl.isBlank()}"
+                     style="height:320px;display:grid;place-items:center;background:linear-gradient(135deg,#2a2a2e,#0a0a0a);color:var(--accent);font-size:1.4rem;font-weight:600">
+                    <span th:text="${machine.type.displayName}">Type</span>
+                </div>
+                <img th:if="${machine.imageUrl != null and !machine.imageUrl.isBlank()}"
+                     class="machine-detail-img" th:src="${machine.imageUrl}" th:alt="${machine.model}"/>
+            </div>
+            <div>
+                <p class="eyebrow" th:text="${machine.type.displayName}">Type</p>
+                <h1 th:text="${machine.model}">Model</h1>
+                <p class="lead" style="margin-bottom:var(--space-3)"
+                   th:text="${machine.description} ?: 'A reliable machine ready for your next job.'">Description</p>
+
+                <div class="table-wrap" style="margin-bottom:var(--space-4)">
+                    <table class="data">
+                        <tr><th>Daily rate</th><td><span th:text="${currencySymbol}">Rs.</span> <span th:text="${#numbers.formatDecimal(machine.dailyRate,1,'COMMA',2,'POINT')}">0</span></td></tr>
+                        <tr><th>Location</th><td th:text="${machine.location}">Location</td></tr>
+                        <tr><th>Registration</th><td th:text="${machine.registrationNumber}">Reg</td></tr>
+                        <tr><th>Ownership</th><td th:text="${machine.ownership.displayName}">Ownership</td></tr>
+                        <tr><th>Status</th><td><span class="pill" th:classappend="${'pill-' + machine.status.name().toLowerCase()}" th:text="${machine.status.displayName}">Status</span></td></tr>
+                    </table>
+                </div>
+
+                <div sec:authorize="hasRole('CUSTOMER')" th:if="${machine.bookable}">
+                    <a class="btn btn-primary" th:href="@{'/bookings/new/' + ${machine.id}}">Book this machine</a>
+                </div>
+                <p class="muted" sec:authorize="hasRole('CUSTOMER')" th:unless="${machine.bookable}">
+                    This machine is currently not available for booking.
+                </p>
+                <div sec:authorize="isAnonymous()">
+                    <a class="btn btn-primary" th:href="@{/login}">Sign in to book</a>
+                    <a class="btn btn-ghost" th:href="@{/register}">Create an account</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<footer th:replace="~{fragments/common :: footer}"></footer>
+</body>
+</html>

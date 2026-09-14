@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/common :: head('Owner dashboard')}"></head>
+<body>
+<nav th:replace="~{fragments/common :: navbar}"></nav>
+<div th:replace="~{fragments/common :: flash}"></div>
+
+<section class="section">
+    <div class="container">
+        <div class="page-head">
+            <div>
+                <p class="eyebrow">Private owner</p>
+                <h1>My machines</h1>
+            </div>
+            <a class="btn btn-primary" th:href="@{/owner/machines/new}">List a machine</a>
+        </div>
+
+        <p class="muted" th:if="${#lists.isEmpty(machines)}">You have not listed any machines yet.</p>
+
+        <div class="table-wrap" th:unless="${#lists.isEmpty(machines)}">
+            <table class="data">
+                <thead>
+                <tr><th>Model</th><th>Type</th><th>Location</th><th>Daily rate</th><th>Status</th><th>Approval</th><th></th></tr>
+                </thead>
+                <tbody>
+                <tr th:each="m : ${machines}">
+                    <td th:text="${m.model}">Model</td>
+                    <td th:text="${m.type.displayName}">Type</td>
+                    <td th:text="${m.location}">Location</td>
+                    <td><span th:text="${currencySymbol}">Rs.</span> <span th:text="${#numbers.formatDecimal(m.dailyRate,1,'COMMA',2,'POINT')}">0</span></td>
+                    <td><span class="pill" th:classappend="${'pill-' + m.status.name().toLowerCase()}" th:text="${m.status.displayName}">Status</span></td>
+                    <td>
+                        <span class="pill pill-approved" th:if="${m.verified}">Approved</span>
+                        <span class="pill pill-pending" th:unless="${m.verified}">Pending</span>
+                    </td>
+                    <td style="display:flex;gap:.4rem">
+                        <a class="btn btn-ghost btn-sm" th:href="@{'/owner/machines/' + ${m.id} + '/edit'}">Edit</a>
+                        <form th:action="@{'/owner/machines/' + ${m.id} + '/delete'}" method="post"
+                              onsubmit="return confirm('Remove this listing?')">
+                            <button class="btn btn-danger btn-sm" type="submit">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+<footer th:replace="~{fragments/common :: footer}"></footer>
+</body>
+</html>

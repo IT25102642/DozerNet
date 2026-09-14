@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/common :: head('Machines')}"></head>
+<body>
+<nav th:replace="~{fragments/common :: navbar}"></nav>
+
+<section class="section">
+    <div class="container">
+        <div class="page-head">
+            <div>
+                <p class="eyebrow">Catalogue</p>
+                <h1 th:text="${selectedJob != null} ? |${selectedJob.name} machines| : 'Available machines'">Available machines</h1>
+                <p class="muted" style="margin:0"
+                   th:text="${selectedJob != null}
+                     ? |Showing machines suited for ${#strings.toLowerCase(selectedJob.name)} jobs.|
+                     : 'Filter by the job you need — same categories as the home page.'">
+                    Filter by the job you need.
+                </p>
+            </div>
+        </div>
+
+        <!-- Job-need filters (match landing rental categories) -->
+        <div class="job-filter" role="group" aria-label="Filter by job need">
+            <a class="job-filter-chip"
+               th:href="@{/machines(keyword=${keyword})}"
+               th:classappend="${selectedJob == null and selectedType == null} ? ' is-active'">
+                All jobs
+            </a>
+            <a class="job-filter-chip"
+               th:each="cat : ${jobCategories}"
+               th:href="@{/machines(job=${cat.slug}, keyword=${keyword})}"
+               th:classappend="${selectedJob != null and selectedJob.slug == cat.slug} ? ' is-active'"
+               th:attr="aria-current=${selectedJob != null and selectedJob.slug == cat.slug} ? 'true' : null">
+                <span th:text="${cat.name}">Digging</span>
+                <span class="job-filter-count" th:text="${cat.machineCount}">0</span>
+            </a>
+        </div>
+
+        <!-- Keyword + optional machine-type refine -->
+        <form class="toolbar" th:action="@{/machines}" method="get">
+            <input type="hidden" name="job" th:if="${selectedJob != null}" th:value="${selectedJob.slug}"/>
+            <input class="input" style="max-width:280px" type="text" name="keyword"
+                   th:value="${keyword}" placeholder="Search by location or model"/>
+            <select class="select" style="max-width:220px" name="type"
+                    th:disabled="${selectedJob != null}"
+                    th:title="${selectedJob != null} ? 'Clear the job filter to refine by machine type' : 'Optional: filter by machine type'">
+                <option value="">All machine types</option>
+                <option th:each="t : ${types}" th:value="${t}" th:text="${t.displayName}"
+                        th:selected="${selectedType != null and selectedType == t}"></option>
+            </select>
+            <button class="btn btn-dark" type="submit">Search</button>
+            <a class="btn btn-ghost" th:href="@{/machines}">Reset</a>
+        </form>
+
+        <p class="muted" th:if="${#lists.isEmpty(machines)}">No machines match your search right now.</p>
+
+        <div class="grid grid-3">
+            <div class="card card-hover machine-card" th:each="m : ${machines}">
+                <div class="machine-thumb" th:if="${m.imageUrl == null or m.imageUrl.isBlank()}"
+                     style="display:grid;place-items:center;background:linear-gradient(135deg,#2a2a2e,#0a0a0a);color:var(--accent);font-weight:600">
+                    <span th:text="${m.type.displayName}">Type</span>
+                </div>
+                <img th:if="${m.imageUrl != null and !m.imageUrl.isBlank()}"
+                     th:src="${m.imageUrl}" th:alt="${m.model}"/>
+                <h3 style="margin-top:1rem" th:text="${m.model}">Model</h3>
+                <p class="muted" style="margin:0">
+                    <span th:text="${m.type.displayName}">Type</span> &middot;
+                    <span th:text="${m.location}">Location</span>
+                </p>
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-top:1rem">
+                    <strong><span th:text="${currencySymbol}">Rs.</span> <span th:text="${#numbers.formatDecimal(m.dailyRate,1,'COMMA',2,'POINT')}">0</span>/day</strong>
+                    <a class="btn btn-primary btn-sm" th:href="@{'/machines/view/' + ${m.id}}">View</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<footer th:replace="~{fragments/common :: footer}"></footer>
+</body>
+</html>

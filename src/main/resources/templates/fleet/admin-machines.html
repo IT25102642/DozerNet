@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/common :: head('Manage fleet')}"></head>
+<body>
+<nav th:replace="~{fragments/common :: navbar}"></nav>
+<div th:replace="~{fragments/common :: flash}"></div>
+
+<section class="section">
+    <div class="container">
+        <div class="page-head">
+            <div>
+                <p class="eyebrow">Admin &middot; Fleet</p>
+                <h1>All machines</h1>
+            </div>
+            <div style="display:flex;gap:.5rem">
+                <a class="btn btn-ghost" th:href="@{/admin/listings}">Pending listings</a>
+                <a class="btn btn-primary" th:href="@{/admin/machines/new}">Add machine</a>
+            </div>
+        </div>
+
+        <p class="muted" th:if="${#lists.isEmpty(machines)}">No machines in the system yet.</p>
+
+        <div class="table-wrap" th:unless="${#lists.isEmpty(machines)}">
+            <table class="data">
+                <thead>
+                <tr><th>Model</th><th>Type</th><th>Owner</th><th>Location</th><th>Rate</th><th>Status</th><th>Change status</th><th></th></tr>
+                </thead>
+                <tbody>
+                <tr th:each="m : ${machines}">
+                    <td th:text="${m.model}">Model</td>
+                    <td th:text="${m.type.displayName}">Type</td>
+                    <td>
+                        <span th:if="${m.ownership.name() == 'COMPANY'}">Company</span>
+                        <span th:unless="${m.ownership.name() == 'COMPANY'}" th:text="${m.owner != null ? m.owner.fullName : 'Private'}">Owner</span>
+                    </td>
+                    <td th:text="${m.location}">Location</td>
+                    <td><span th:text="${currencySymbol}">Rs.</span> <span th:text="${#numbers.formatDecimal(m.dailyRate,1,'COMMA',2,'POINT')}">0</span></td>
+                    <td><span class="pill" th:classappend="${'pill-' + m.status.name().toLowerCase()}" th:text="${m.status.displayName}">Status</span></td>
+                    <td>
+                        <form th:action="@{'/admin/machines/' + ${m.id} + '/status'}" method="post" style="display:flex;gap:.3rem">
+                            <select class="select" name="status" style="padding:.35rem .5rem">
+                                <option th:each="s : ${statuses}" th:value="${s}" th:text="${s.displayName}"
+                                        th:selected="${s == m.status}"></option>
+                            </select>
+                            <button class="btn btn-ghost btn-sm" type="submit">Set</button>
+                        </form>
+                    </td>
+                    <td style="display:flex;gap:.4rem">
+                        <a class="btn btn-ghost btn-sm" th:href="@{'/admin/machines/' + ${m.id} + '/edit'}">Edit</a>
+                        <form th:action="@{'/admin/machines/' + ${m.id} + '/delete'}" method="post"
+                              onsubmit="return confirm('Delete this machine?')">
+                            <button class="btn btn-danger btn-sm" type="submit">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+<footer th:replace="~{fragments/common :: footer}"></footer>
+</body>
+</html>

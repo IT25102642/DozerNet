@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/common :: head('Owner registration')}"></head>
+<body>
+<nav th:replace="~{fragments/common :: navbar}"></nav>
+
+<div class="auth-wrap">
+    <div class="card auth-card">
+        <p class="eyebrow">Private JCB owner</p>
+        <h1 style="font-size:1.8rem">List your machines</h1>
+        <p class="muted">Register as a private owner. Your listings go live once an admin verifies them.</p>
+
+        <form th:action="@{/register/owner}" th:object="${ownerForm}" method="post" enctype="multipart/form-data" novalidate>
+            <div class="alert alert-danger" th:if="${#fields.hasGlobalErrors()}">
+                <div th:each="err : ${#fields.globalErrors()}" th:text="${err}">error</div>
+            </div>
+            <div class="field">
+                <label for="fullName">Full name</label>
+                <input class="input" id="fullName" type="text" th:field="*{fullName}"/>
+                <div class="field-error" th:if="${#fields.hasErrors('fullName')}" th:errors="*{fullName}"></div>
+            </div>
+            <div class="field">
+                <label for="email">Email</label>
+                <input class="input" id="email" type="email" th:field="*{email}"/>
+                <div class="field-error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
+            </div>
+            <div class="field">
+                <label for="phone">Phone</label>
+                <input class="input" id="phone" type="text" th:field="*{phone}" placeholder="0771234567"/>
+                <div class="field-error" th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}"></div>
+            </div>
+            <div class="field">
+                <label for="identityCardNumber">Identity card number (NIC)</label>
+                <input class="input" id="identityCardNumber" type="text" th:field="*{identityCardNumber}"
+                       placeholder="199512345678 or 123456789V"/>
+                <div class="field-error" th:if="${#fields.hasErrors('identityCardNumber')}" th:errors="*{identityCardNumber}"></div>
+                <p class="muted" style="font-size:.8rem;margin:.35rem 0 0">This cannot be changed after registration.</p>
+            </div>
+            <div class="form-row">
+                <div class="field">
+                    <label for="password">Password</label>
+                    <input class="input" id="password" type="password" th:field="*{password}"/>
+                    <div class="field-error" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></div>
+                </div>
+                <div class="field">
+                    <label for="confirmPassword">Confirm password</label>
+                    <input class="input" id="confirmPassword" type="password" th:field="*{confirmPassword}"/>
+                    <div class="field-error" th:if="${#fields.hasErrors('confirmPassword')}" th:errors="*{confirmPassword}"></div>
+                </div>
+            </div>
+            <div class="field">
+                <label for="nicCopy">NIC copy (optional)</label>
+                <input class="input" id="nicCopy" type="file" name="nicCopy"
+                       accept="image/jpeg,image/png,image/webp,application/pdf"/>
+                <p class="muted" style="margin:.35rem 0 0">
+                    Speeds up verification. Kept on your account for future listings.
+                </p>
+            </div>
+            <button class="btn btn-primary btn-block" type="submit">Register as owner</button>
+        </form>
+        <p class="muted" style="margin-top:var(--space-3);text-align:center">
+            Already registered? <a th:href="@{/login}">Sign in</a>
+        </p>
+    </div>
+</div>
+
+<footer th:replace="~{fragments/common :: footer}"></footer>
+</body>
+</html>

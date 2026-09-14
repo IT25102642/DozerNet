@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/common :: head('Machine')}"></head>
+<body>
+<nav th:replace="~{fragments/common :: navbar}"></nav>
+
+<section class="section">
+    <div class="container form-panel">
+        <a class="muted" th:href="@{/admin/machines}">&larr; Back to fleet</a>
+        <h1 th:text="${mode == 'edit'} ? 'Edit machine' : 'Add company machine'">Machine</h1>
+
+        <form class="card"
+              th:action="${mode == 'edit'} ? @{'/admin/machines/' + ${machineId} + '/edit'} : @{/admin/machines/new}"
+              th:object="${machineForm}" method="post" novalidate>
+            <div class="field">
+                <label for="model">Model / name</label>
+                <input class="input" id="model" type="text" th:field="*{model}" placeholder="JCB 3CX Backhoe Loader"/>
+                <div class="field-error" th:if="${#fields.hasErrors('model')}" th:errors="*{model}"></div>
+            </div>
+            <div class="form-row">
+                <div class="field">
+                    <label for="type">Type</label>
+                    <select class="select" id="type" th:field="*{type}">
+                        <option th:each="t : ${types}" th:value="${t}" th:text="${t.displayName}"></option>
+                    </select>
+                    <div class="field-error" th:if="${#fields.hasErrors('type')}" th:errors="*{type}"></div>
+                </div>
+                <div class="field">
+                    <label for="registrationNumber">Registration number</label>
+                    <input class="input" id="registrationNumber" type="text" th:field="*{registrationNumber}" placeholder="WP ABC-1234"/>
+                    <div class="field-error" th:if="${#fields.hasErrors('registrationNumber')}" th:errors="*{registrationNumber}"></div>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="field">
+                    <label for="location">Location</label>
+                    <input class="input" id="location" type="text" th:field="*{location}" placeholder="Colombo"/>
+                    <div class="field-error" th:if="${#fields.hasErrors('location')}" th:errors="*{location}"></div>
+                </div>
+                <div class="field">
+                    <label for="dailyRate">Daily rate (Rs.)</label>
+                    <input class="input" id="dailyRate" type="number" step="0.01" min="1" th:field="*{dailyRate}" placeholder="15000.00"/>
+                    <div class="field-error" th:if="${#fields.hasErrors('dailyRate')}" th:errors="*{dailyRate}"></div>
+                </div>
+            </div>
+            <div class="field">
+                <label for="imageUrl">Image URL (optional)</label>
+                <input class="input" id="imageUrl" type="text" th:field="*{imageUrl}" placeholder="https://..."/>
+            </div>
+            <div class="field">
+                <label for="description">Description (optional)</label>
+                <textarea class="textarea" id="description" rows="3" th:field="*{description}"></textarea>
+            </div>
+            <button class="btn btn-primary" type="submit" th:text="${mode == 'edit'} ? 'Save changes' : 'Add machine'">Save</button>
+        </form>
+    </div>
+</section>
+
+<footer th:replace="~{fragments/common :: footer}"></footer>
+</body>
+</html>

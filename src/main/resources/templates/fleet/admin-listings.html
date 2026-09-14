@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/common :: head('Pending listings')}"></head>
+<body>
+<nav th:replace="~{fragments/common :: navbar}"></nav>
+<div th:replace="~{fragments/common :: flash}"></div>
+
+<section class="section">
+    <div class="container">
+        <div class="page-head">
+            <div>
+                <p class="eyebrow">Admin &middot; Verification</p>
+                <h1>Pending owner listings</h1>
+            </div>
+            <a class="btn btn-ghost" th:href="@{/admin/machines}">All machines</a>
+        </div>
+
+        <p class="muted" th:if="${#lists.isEmpty(machines)}">No listings awaiting approval.</p>
+
+        <div class="table-wrap" th:unless="${#lists.isEmpty(machines)}">
+            <table class="data">
+                <thead>
+                <tr><th>Model</th><th>Type</th><th>Owner</th><th>Documents</th><th>Location</th><th>Rate</th><th>Actions</th></tr>
+                </thead>
+                <tbody>
+                <tr th:each="m : ${machines}">
+                    <td th:text="${m.model}">Model</td>
+                    <td th:text="${m.type.displayName}">Type</td>
+                    <td th:text="${m.owner != null ? m.owner.fullName : '-'}">Owner</td>
+                    <td>
+                        <th:block th:if="${m.owner != null and ownerDocuments.get(m.owner.id) != null}">
+                            <a th:each="doc : ${ownerDocuments.get(m.owner.id)}"
+                               class="btn btn-ghost btn-sm" style="margin:0 .2rem .2rem 0"
+                               th:href="@{'/documents/' + ${doc.id}}" target="_blank"
+                               th:text="${doc.type.displayName}">Document</a>
+                            <span class="muted" th:if="${#lists.isEmpty(ownerDocuments.get(m.owner.id))}">None uploaded</span>
+                        </th:block>
+                    </td>
+                    <td th:text="${m.location}">Location</td>
+                    <td><span th:text="${currencySymbol}">Rs.</span> <span th:text="${#numbers.formatDecimal(m.dailyRate,1,'COMMA',2,'POINT')}">0</span></td>
+                    <td style="display:flex;gap:.4rem">
+                        <form th:action="@{'/admin/listings/' + ${m.id} + '/approve'}" method="post">
+                            <button class="btn btn-primary btn-sm" type="submit">Approve</button>
+                        </form>
+                        <form th:action="@{'/admin/listings/' + ${m.id} + '/reject'}" method="post"
+                              onsubmit="return confirm('Reject and remove this listing?')">
+                            <button class="btn btn-danger btn-sm" type="submit">Reject</button>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+<footer th:replace="~{fragments/common :: footer}"></footer>
+</body>
+</html>
