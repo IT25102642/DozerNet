@@ -88,6 +88,26 @@ public class DocumentService {
         return documentRepository.findByOwnerOrderByCreatedAtDesc(owner);
     }
 
+    /**
+     * Permanently removes every document the account uploaded, both the
+     * database rows and the stored files (used when an account is deleted).
+     */
+    @Transactional
+    public void deleteAllFor(User owner) {
+        List<Document> documents = documentRepository.findByOwnerOrderByCreatedAtDesc(owner);
+        for (Document document : documents) {
+            Path path = uploadRoot.resolve(document.getStoredFilename()).normalize();
+            if (path.startsWith(uploadRoot)) {
+                try {
+                    Files.deleteIfExists(path);
+                } catch (IOException ex) {
+                    log.warn("Could not remove stored file for document {}", document.getId(), ex);
+                }
+            }
+        }
+        documentRepository.deleteAll(documents);
+    }
+
     public Document getById(Long id) {
         return documentRepository.findById(id)
                 .orElseThrow(() -> ResourceNotFoundException.of("Document", id));
