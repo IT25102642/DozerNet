@@ -5,6 +5,7 @@ import com.dozernet.common.exception.BusinessRuleException;
 import com.dozernet.common.security.CurrentUserService;
 import com.dozernet.common.user.User;
 import com.dozernet.module1_customer.dto.ProfileForm;
+import com.dozernet.module1_customer.service.AccountDeletionService;
 import com.dozernet.module1_customer.service.CustomerService;
 import com.dozernet.module6_payment.service.PaymentService;
 import jakarta.validation.Valid;
@@ -28,13 +29,16 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 public class CustomerController {
 
     private final CustomerService customerService;
+    private final AccountDeletionService accountDeletionService;
     private final CurrentUserService currentUserService;
     private final PaymentService paymentService;
 
     public CustomerController(CustomerService customerService,
+                              AccountDeletionService accountDeletionService,
                               CurrentUserService currentUserService,
                               PaymentService paymentService) {
         this.customerService = customerService;
+        this.accountDeletionService = accountDeletionService;
         this.currentUserService = currentUserService;
         this.paymentService = paymentService;
     }
@@ -56,6 +60,7 @@ public class CustomerController {
         model.addAttribute("user", user);
         model.addAttribute("documents", customerService.documentsFor(user));
         model.addAttribute("documentTypes", DocumentType.values());
+        model.addAttribute("deletionCheck", accountDeletionService.check(user));
         return "customer/profile";
     }
 
@@ -86,6 +91,7 @@ public class CustomerController {
             model.addAttribute("user", user);
             model.addAttribute("documents", customerService.documentsFor(user));
             model.addAttribute("documentTypes", DocumentType.values());
+            model.addAttribute("deletionCheck", accountDeletionService.check(user));
             return "customer/profile";
         }
         try {
