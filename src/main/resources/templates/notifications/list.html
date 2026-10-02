@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/common :: head('Notifications')}"></head>
+<body>
+<nav th:replace="~{fragments/common :: navbar}"></nav>
+
+<section class="section">
+    <div class="container form-panel">
+        <div class="page-head">
+            <h1>Notifications</h1>
+            <form th:action="@{/notifications/read-all}" method="post">
+                <button class="btn btn-ghost btn-sm" type="submit">Mark all read</button>
+            </form>
+        </div>
+
+        <p class="muted" th:if="${#lists.isEmpty(notifications)}">You have no notifications yet.</p>
+
+        <div class="grid" style="gap:var(--space-2)">
+            <div class="card" th:each="n : ${notifications}"
+                 th:style="${n.readFlag} ? '' : 'border-left:3px solid var(--accent)'">
+                <div style="display:flex;justify-content:space-between;gap:1rem">
+                    <strong th:text="${n.title}">Title</strong>
+                    <span class="muted" style="font-size:.8rem" th:text="${#temporals.format(n.createdAt, 'dd MMM, HH:mm')}">date</span>
+                </div>
+                <p style="margin:.3rem 0 0" th:text="${n.message}">Message</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<footer th:replace="~{fragments/common :: footer}"></footer>
+</body>
+</html>
