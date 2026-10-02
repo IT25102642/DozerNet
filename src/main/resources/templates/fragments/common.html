@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:fragment="head(title)">
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title th:text="${title} ? ${title} + ' · DozerNet' : 'DozerNet'">DozerNet</title>
+    <link rel="icon" type="image/png" th:href="@{/images/favicon.png}"/>
+    <link rel="apple-touch-icon" th:href="@{/images/dozernet-icon.png}"/>
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous"/>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&amp;family=Space+Grotesk:wght@500;600;700&amp;display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" th:href="@{/css/app.css}"/>
+</head>
+<body>
+
+<!-- ===================== NAVBAR ===================== -->
+<nav th:fragment="navbar" class="nav">
+    <div class="container nav-inner">
+        <a class="brand" th:href="@{/}" aria-label="DozerNet home">
+            <img class="brand-logo" th:src="@{/images/dozernet-logo.png}" alt="DozerNet"/>
+        </a>
+        <ul class="nav-links">
+            <li><a class="hide-sm" th:href="@{/machines}">Machines</a></li>
+            <li><a class="hide-sm" th:href="@{/how-it-works}">How it works</a></li>
+            <li><a class="hide-sm" th:href="@{/about}">About</a></li>
+
+            <!-- Guest -->
+            <li sec:authorize="isAnonymous()"><a th:href="@{/login}">Sign in</a></li>
+            <li sec:authorize="isAnonymous()"><a class="btn btn-primary btn-sm" th:href="@{/register}">Get started</a></li>
+
+            <!-- Authenticated — customer alerts owned by Module 1 -->
+            <li sec:authorize="hasRole('CUSTOMER')">
+                <a th:href="@{/customer/notifications}">
+                    Alerts<span class="badge-count" th:if="${unreadNotifications > 0}" th:text="${unreadNotifications}">0</span>
+                </a>
+            </li>
+            <li sec:authorize="isAuthenticated() and !hasRole('CUSTOMER')">
+                <a th:href="@{/notifications}">
+                    Alerts<span class="badge-count" th:if="${unreadNotifications > 0}" th:text="${unreadNotifications}">0</span>
+                </a>
+            </li>
+            <!-- One account can hold several roles, so each dashboard it can reach is listed. -->
+            <li sec:authorize="hasRole('CUSTOMER')">
+                <a th:href="@{/customer/dashboard}"
+                   th:text="${currentUser != null and currentUser.roles.size() > 1} ? 'Customer' : 'Dashboard'">Dashboard</a>
+            </li>
+            <li sec:authorize="hasRole('OWNER')">
+                <a th:href="@{/owner/dashboard}"
+                   th:text="${currentUser != null and currentUser.roles.size() > 1} ? 'Owner' : 'Dashboard'">Dashboard</a>
+            </li>
+            <li sec:authorize="hasRole('OPERATOR')">
+                <a th:href="@{/operator/dashboard}"
+                   th:text="${currentUser != null and currentUser.roles.size() > 1} ? 'Operator' : 'Dashboard'">Dashboard</a>
+            </li>
+            <li sec:authorize="hasRole('ADMIN')"><a th:href="@{/admin/dashboard}">Admin</a></li>
+            <li sec:authorize="isAuthenticated()">
+                <form th:action="@{/logout}" method="post" style="display:inline">
+                    <button class="btn btn-ghost btn-sm" type="submit">Sign out</button>
+                </form>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+<!-- ===================== FLASH MESSAGES ===================== -->
+<div th:fragment="flash" class="container" style="margin-top:1rem">
+    <div class="alert alert-success" th:if="${success}" th:text="${success}"></div>
+    <div class="alert alert-danger" th:if="${error}" th:text="${error}"></div>
+    <div class="alert alert-info" th:if="${info}" th:text="${info}"></div>
+</div>
+
+<!-- ===================== FOOTER ===================== -->
+<footer th:fragment="footer" class="footer">
+    <div class="container">
+        <a class="brand" th:href="@{/}" aria-label="DozerNet home">
+            <img class="brand-logo brand-logo-footer" th:src="@{/images/dozernet-logo.png}" alt="DozerNet"/>
+        </a>
+        <p style="margin-top:.6rem">Web-Based JCB Management System &middot; SE2030 Software Engineering Group Project.</p>
+        <p class="muted">&copy; 2026 DozerNet. Built by Group MLB-B4G2-09.</p>
+    </div>
+</footer>
+
+<!-- ===================== SCROLL REVEAL SCRIPT ===================== -->
+<th:block th:fragment="reveal-script">
+    <script>
+        (function () {
+            const els = document.querySelectorAll('.reveal');
+            if (!('IntersectionObserver' in window) || els.length === 0) {
+                els.forEach(e => e.classList.add('in'));
+                return;
+            }
+            const io = new IntersectionObserver((entries) => {
+                entries.forEach(en => { if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); } });
+            }, { threshold: 0.12 });
+            els.forEach(e => io.observe(e));
+        })();
+    </script>
+</th:block>
+
+</body>
+</html>
