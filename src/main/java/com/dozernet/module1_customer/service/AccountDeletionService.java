@@ -1,9 +1,11 @@
 package com.dozernet.module1_customer.service;
 
 import com.dozernet.common.audit.AuditService;
+import com.dozernet.common.document.DocumentService;
 import com.dozernet.common.exception.BusinessRuleException;
 import com.dozernet.common.exception.ResourceNotFoundException;
 import com.dozernet.common.model.Role;
+import com.dozernet.common.notification.NotificationService;
 import com.dozernet.common.user.User;
 import com.dozernet.common.user.UserRepository;
 import com.dozernet.module2_booking.entity.Booking;
@@ -56,17 +58,23 @@ public class AccountDeletionService {
     private final PasswordEncoder passwordEncoder;
     private final BookingService bookingService;
     private final PaymentService paymentService;
+    private final DocumentService documentService;
+    private final NotificationService notificationService;
     private final AuditService auditService;
 
     public AccountDeletionService(UserRepository userRepository,
                                   PasswordEncoder passwordEncoder,
                                   BookingService bookingService,
                                   PaymentService paymentService,
+                                  DocumentService documentService,
+                                  NotificationService notificationService,
                                   AuditService auditService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.bookingService = bookingService;
         this.paymentService = paymentService;
+        this.documentService = documentService;
+        this.notificationService = notificationService;
         this.auditService = auditService;
     }
 
@@ -135,6 +143,8 @@ public class AccountDeletionService {
         // Audit first, while the signed-in user is still the actor. Only the id is logged, no personal data.
         auditService.record("ACCOUNT_DELETED", "User", user.getId(), "Customer deleted their own account");
 
+        documentService.deleteAllFor(user);
+        notificationService.deleteAllFor(user);
         anonymise(user);
         userRepository.save(user);
     }
