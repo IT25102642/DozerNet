@@ -2,6 +2,7 @@ package com.dozernet.module1_customer;
 
 import com.dozernet.common.audit.AuditService;
 import com.dozernet.common.document.DocumentService;
+import com.dozernet.common.exception.BusinessRuleException;
 import com.dozernet.common.model.Role;
 import com.dozernet.common.notification.NotificationService;
 import com.dozernet.common.user.User;
@@ -24,10 +25,15 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -119,5 +125,71 @@ class AccountDeletionServiceTest {
 
         assertThat(check.allowed()).isFalse();
         assertThat(check.message()).contains("private jcb owner").contains("administrator");
+    }
+
+    // ---------- deleting ----------
+
+    @Test
+    void deletingAnonymisesTheAccountAndErasesItsData() {
+        service.deleteOwnAccount(customer, "right-password", true);
+
+        assertThat(customer.isDeleted()).isTrue();
+        assertThat(customer.isEnabled()).isFalse();
+        assertThat(customer.getFullName()).isEqualTo("Deleted customer");
+        assertThat(customer.getEmail()).isEqualTo("deleted-42@deleted.invalid");
+        assertThat(customer.getPhone()).isEqualTo("deleted-42");
+        assertThat(customer.getIdentityCardNumber()).isEqualTo("DEL-42");
+        assertThat(customer.getPasswordHash()).isEqualTo("random-hash");
+        verify(documentService).deleteAllFor(customer);
+        verify(notificationService).deleteAllFor(customer);
+        verify(userRepository).save(customer);
+        verify(auditService).record(eq("ACCOUNT_DELETED"), eq("User"), eq(42L), anyString());
+    }
+
+    @Test
+    void deletionIsRefusedWhileBookingsAreOpenAndNothingIsTouched() {
+        doReturn(List.of(booking(BookingStatus.APPROVED))).when(bookingService).forCustomer(customer);
+
+        assertThatThrownBy(() -> service.deleteOwnAccount(customer, "right-password", true))
+                .isInstanceOf(BusinessRuleException.class)
+                .hasMessageContaining("can't delete your account yet");
+
+        assertThat(customer.isDeleted()).isFalse();
+        assertThat(customer.getEmail()).isEqualTo("real@example.com");
+        verify(documentService, never()).deleteAllFor(any());
+        verify(notificationService, never()).deleteAllFor(any());
+        verify(userRepository, never()).save(any());
+    }
+
+    @Test
+    void aWrongPasswordIsRefused() {
+        assertThatThrownBy(() -> service.deleteOwnAccount(customer, "wrong", true))
+                .isInstanceOf(BusinessRuleException.class)
+                .hasMessageContaining("password is incorrect");
+        assertThat(customer.isDeleted()).isFalse();
+    }
+
+    @Test
+    void aMissingPasswordIsRefused() {
+        assertThatThrownBy(() -> service.deleteOwnAccount(customer, null, true))
+                .isInstanceOf(BusinessRuleException.class);
+        assertThat(customer.isDeleted()).isFalse();
+    }
+
+    @Test
+    void theConfirmationBoxMustBeTicked() {
+        assertThatThrownBy(() -> service.deleteOwnAccount(customer, "right-password", false))
+                .isInstanceOf(BusinessRuleException.class)
+                .hasMessageContaining("tick the box");
+        assertThat(customer.isDeleted()).isFalse();
+    }
+
+    @Test
+    void anAlreadyDeletedAccountCannotBeDeletedTwice() {
+        customer.setDeleted(true);
+
+        assertThatThrownBy(() -> service.deleteOwnAccount(customer, "right-password", true))
+                .isInstanceOf(BusinessRuleException.class)
+                .hasMessageContaining("already been deleted");
     }
 }
