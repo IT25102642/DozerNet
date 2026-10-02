@@ -27,6 +27,10 @@ import java.util.List;
  * is safe to run on every boot: it only touches users whose legacy role has
  * not yet been copied across, so it is a no-op once the one-time backfill has
  * happened.</p>
+ *
+ * <p>It also relaxes the legacy column to {@code NULL}. The entity no longer
+ * writes to it, so while it stays {@code NOT NULL} MySQL (strict mode) rejects
+ * every new account with "Field 'role' doesn't have a default value".</p>
  */
 @Component
 @Order(2)
@@ -45,6 +49,7 @@ public class RoleMigration implements CommandLineRunner {
         if (!legacyRoleColumnExists()) {
             return;
         }
+        relaxLegacyRoleColumn();
 
         List<Object[]> missing = new ArrayList<>();
         jdbcTemplate.query("""
@@ -64,6 +69,22 @@ public class RoleMigration implements CommandLineRunner {
             jdbcTemplate.update("insert into user_roles (user_id, role) values (?, ?)", row[0], row[1]);
         }
         log.info("Backfilled user_roles for {} account(s) migrated from the old single-role column", missing.size());
+    }
+
+    /** Lets new accounts be inserted without the legacy scalar {@code role}. Idempotent. */
+    private void relaxLegacyRoleColumn() {
+        try {
+            String nullable = jdbcTemplate.queryForObject("""
+                    select is_nullable from information_schema.columns
+                    where table_schema = database() and table_name = 'users' and column_name = 'role'
+                    """, String.class);
+            if ("NO".equalsIgnoreCase(nullable)) {
+                jdbcTemplate.execute("alter table users modify column role varchar(32) null");
+                log.info("Legacy users.role column is now nullable so new accounts can be created");
+            }
+        } catch (Exception ex) {
+            log.warn("Could not relax the legacy users.role column: {}", ex.getMessage());
+        }
     }
 
     /**
