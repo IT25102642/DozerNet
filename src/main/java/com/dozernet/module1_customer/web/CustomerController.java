@@ -84,6 +84,8 @@ public class CustomerController {
         User user = currentUserService.require();
         if (binding.hasErrors()) {
             model.addAttribute("user", user);
+            model.addAttribute("documents", customerService.documentsFor(user));
+            model.addAttribute("documentTypes", DocumentType.values());
             return "customer/profile";
         }
         try {
