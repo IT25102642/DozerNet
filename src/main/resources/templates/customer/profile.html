@@ -120,6 +120,19 @@
                 </ul>
                 Once these are done you can delete your account from this page.
             </div>
+
+            <form th:if="${deletionCheck.allowed()}" th:action="@{/customer/account/delete}" method="post">
+                <div class="field">
+                    <label for="deletePassword">Confirm with your password</label>
+                    <input class="input" id="deletePassword" type="password" name="password"
+                           autocomplete="current-password" required/>
+                </div>
+                <label style="display:flex;gap:.5rem;align-items:flex-start;font-size:.92rem;margin-bottom:var(--space-3)">
+                    <input type="checkbox" name="confirm" value="true" required style="margin-top:.2rem"/>
+                    <span>I understand that my account will be permanently deleted.</span>
+                </label>
+                <button class="btn btn-danger" type="submit">Delete my account</button>
+            </form>
         </div>
     </div>
 </section>
