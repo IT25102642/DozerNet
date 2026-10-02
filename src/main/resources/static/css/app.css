@@ -113,3 +113,390 @@ a:hover { text-decoration: underline; }
 .nav-links a:hover { color: var(--ink-soft); text-decoration: none; }
 .badge-count { background: var(--danger); color: #fff; border-radius: 999px; font-size: .68rem; padding: 1px 6px; margin-left: 3px; }
 
+/* ---------- Hero (light, welcoming; live fleet showcase on the right) ---------- */
+.hero {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    /* Same base as the page so the hero melts into the sections around it */
+    background:
+        radial-gradient(ellipse 50% 55% at 12% 32%, rgba(255, 203, 5, .15), transparent 70%),
+        radial-gradient(ellipse 38% 45% at 96% 45%, rgba(255, 203, 5, .07), transparent 70%),
+        var(--bg);
+    color: var(--ink);
+}
+/* Grid-paper backdrop: crumpled paper texture (from docs/Old White Grid Paper Texture.jpeg,
+   grid removed) under crisp CSS grid lines, both kept very light */
+.hero::before,
+.hero::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    /* Fade in from under the navbar and out into the section below — no hard edges */
+    -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 16%, #000 68%, transparent 100%);
+    mask-image: linear-gradient(180deg, transparent 0%, #000 16%, #000 68%, transparent 100%);
+}
+.hero::before {
+    background: url("../images/hero-paper.jpg") center / cover no-repeat;
+    mix-blend-mode: multiply;
+    opacity: .26;
+}
+.hero::after {
+    background-image:
+        linear-gradient(rgba(29, 29, 31, .065) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(29, 29, 31, .065) 1px, transparent 1px);
+    background-size: 56px 56px;
+    background-position: center -1px;
+}
+
+.hero-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.08fr) minmax(0, .92fr);
+    align-items: center;
+    gap: clamp(3rem, 6vw, 6.5rem);
+    max-width: 1300px;      /* a little wider than the page container, so the hero fills the screen */
+    height: clamp(640px, calc(100vh - 110px), 860px);
+}
+/* On the home page the navbar matches the hero's width, so logo and headline line up */
+.page-home .nav-inner { max-width: 1300px; }
+
+/* --- Copy --- */
+.hero-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: .6rem;
+    margin: 0 0 1.5rem;
+    padding: .42rem .95rem .42rem .8rem;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, .75);
+    box-shadow: inset 0 1px 0 #fff, var(--shadow-sm);
+    color: var(--ink-soft);
+    font-size: .92rem;
+    font-weight: 500;
+}
+.hero-live {
+    position: relative;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--success);
+}
+.hero-live::after {
+    content: "";
+    position: absolute;
+    inset: -4px;
+    border-radius: 50%;
+    border: 2px solid var(--success);
+    opacity: 0;
+    animation: heroLive 2.4s ease-out infinite;
+}
+@keyframes heroLive {
+    0% { transform: scale(.5); opacity: .55; }
+    100% { transform: scale(1.6); opacity: 0; }
+}
+
+.hero-title {
+    color: var(--ink);
+    font-size: clamp(2.5rem, 4.7vw, 4.6rem);
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: -0.045em;
+    margin: 0 0 1.4rem;
+}
+.hero-line { display: block; }
+@media (min-width: 621px) {
+    .hero-line { white-space: nowrap; }
+}
+.hero-mark {
+    padding: 0 .06em;
+    margin: 0 -.06em;
+    background: linear-gradient(var(--accent), var(--accent)) no-repeat 0 78% / 100% .3em;
+    animation: heroMarkDraw .8s cubic-bezier(.22, 1, .36, 1) .7s both;
+}
+@keyframes heroMarkDraw {
+    from { background-size: 0 .3em; }
+}
+.hero-lede {
+    max-width: 46ch;
+    margin: 0;
+    color: var(--ink-soft);
+    font-size: clamp(1.08rem, 1.45vw, 1.3rem);
+    line-height: 1.6;
+}
+
+/* Shared action row (also used by the CTA band further down the page) */
+.hero-actions { display: flex; gap: .8rem; margin-top: var(--space-4); flex-wrap: wrap; }
+.hero .hero-actions { margin-top: 2.25rem; align-items: center; }
+.hero .btn-lg { padding: 1.05rem 1.95rem; font-size: 1.06rem; }
+
+/* Glass buttons (hero only): soft top highlight + hairline edge, kept subtle */
+.hero .btn-primary {
+    background-color: var(--accent);
+    background-image: linear-gradient(180deg, rgba(255, 255, 255, .32) 0%, rgba(255, 255, 255, 0) 55%);
+    border-color: rgba(224, 168, 0, .35);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, .6),
+        0 1px 2px rgba(0, 0, 0, .08),
+        0 10px 24px rgba(224, 168, 0, .2);
+}
+.hero .btn-primary:hover {
+    background-color: var(--accent-dark);
+    background-image: linear-gradient(180deg, rgba(255, 255, 255, .32) 0%, rgba(255, 255, 255, 0) 55%);
+}
+.hero-btn-glass {
+    color: var(--ink);
+    background-color: rgba(255, 255, 255, .6);
+    background-image: linear-gradient(180deg, rgba(255, 255, 255, .9), rgba(255, 255, 255, .35));
+    border-color: rgba(29, 29, 31, .1);
+    box-shadow:
+        inset 0 1px 0 #fff,
+        0 1px 2px rgba(0, 0, 0, .05),
+        0 8px 20px rgba(0, 0, 0, .06);
+    -webkit-backdrop-filter: blur(14px) saturate(160%);
+    backdrop-filter: blur(14px) saturate(160%);
+}
+.hero-btn-glass:hover {
+    color: var(--ink);
+    background-color: #fff;
+    border-color: rgba(29, 29, 31, .2);
+}
+
+.hero-trust {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .6rem 1.5rem;
+    list-style: none;
+    margin: 2.25rem 0 0;
+    padding: 0;
+    color: var(--ink-soft);
+    font-size: .96rem;
+    font-weight: 500;
+}
+.hero-trust li { display: inline-flex; align-items: center; gap: .5rem; }
+.hero-check {
+    display: inline-grid;
+    place-items: center;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--accent);
+}
+.hero-check::after {
+    content: "";
+    width: 7px;
+    height: 4px;
+    margin-top: -2px;
+    border-left: 2px solid var(--accent-ink);
+    border-bottom: 2px solid var(--accent-ink);
+    transform: rotate(-45deg);
+}
+
+/* --- Live fleet showcase: two columns of real machine cards drifting in opposite directions --- */
+.hero-showcase {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+    height: 100%;
+    overflow: hidden;
+    -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 14%, #000 86%, transparent 100%);
+    mask-image: linear-gradient(180deg, transparent 0%, #000 14%, #000 86%, transparent 100%);
+}
+.hero-col { min-width: 0; }
+.hero-col-b { padding-top: 5rem; }
+.hero-track {
+    --gap: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap);
+    margin: 0;
+    padding: 0 0 var(--gap);   /* makes -50% exactly one full set, so the loop is seamless */
+    list-style: none;
+    animation: heroDriftUp 42s linear infinite;
+}
+.hero-col-b .hero-track {
+    animation-duration: 50s;
+    animation-direction: reverse;
+}
+.hero-showcase:hover .hero-track,
+.hero-showcase:focus-within .hero-track { animation-play-state: paused; }
+@keyframes heroDriftUp {
+    to { transform: translateY(-50%); }
+}
+@keyframes heroDriftLeft {
+    to { transform: translateX(-50%); }
+}
+
+.hero-card {
+    display: block;
+    padding: 12px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+    box-shadow: var(--shadow-sm);
+    color: var(--ink);
+    transition: transform .3s cubic-bezier(.22, 1, .36, 1), box-shadow .3s ease;
+}
+.hero-card:hover {
+    text-decoration: none;
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
+}
+.hero-card-media {
+    position: relative;
+    display: block;
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+    border-radius: 14px;
+    background: #ececed;
+}
+.hero-card-media img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform .6s cubic-bezier(.22, 1, .36, 1);
+}
+.hero-card:hover .hero-card-media img { transform: scale(1.04); }
+.hero-card-status {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+    padding: .25rem .6rem .25rem .5rem;
+    border: 1px solid rgba(255, 255, 255, .6);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, .78);
+    -webkit-backdrop-filter: blur(10px) saturate(160%);
+    backdrop-filter: blur(10px) saturate(160%);
+    color: var(--ink);
+    font-size: .72rem;
+    font-weight: 600;
+}
+.hero-card-status::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--success);
+}
+.hero-card-body {
+    display: block;
+    padding: .8rem .4rem .3rem;
+}
+.hero-card-title {
+    display: block;
+    overflow: hidden;
+    font-family: var(--font-display);
+    font-size: 1.05rem;
+    font-weight: 600;
+    letter-spacing: -.015em;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+.hero-card-meta {
+    display: block;
+    margin-top: .15rem;
+    overflow: hidden;
+    color: var(--ink-soft);
+    font-size: .86rem;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+.hero-card-foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: .7rem;
+}
+.hero-card-price {
+    font-size: 1.05rem;
+    font-weight: 700;
+    letter-spacing: -.01em;
+}
+.hero-card-price small {
+    margin-left: .1rem;
+    color: var(--ink-soft);
+    font-size: .78rem;
+    font-weight: 500;
+}
+.hero-card-go {
+    display: inline-grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: var(--bg);
+    color: var(--ink);
+    font-size: .9rem;
+    transition: background .2s ease;
+}
+.hero-card:hover .hero-card-go { background: var(--accent); }
+
+.hero a:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(255, 203, 5, .55);
+}
+
+/* Entrance */
+.hero-anim {
+    animation: heroRise .8s cubic-bezier(.22, 1, .36, 1) both;
+    animation-delay: calc(var(--d, 0) * 90ms + 80ms);
+}
+@keyframes heroRise {
+    from { opacity: 0; transform: translateY(18px); }
+}
+
+@media (max-width: 1180px) {
+    .hero-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .hero-card { padding: 10px; }
+    .hero-card-title { font-size: .95rem; }
+    .hero-card-meta { font-size: .75rem; }
+    .hero-card-price { font-size: .95rem; }
+}
+@media (max-width: 900px) {
+    /* Stacked: copy first, then one horizontal strip of cards drifting sideways */
+    .hero-grid {
+        grid-template-columns: 1fr;
+        height: auto;
+        gap: 2.5rem;
+        padding-block: clamp(2.5rem, 7vw, 3.5rem) 2.5rem;
+    }
+    .hero-showcase {
+        display: block;
+        height: auto;
+        margin-inline: calc(var(--space-4) * -1);
+        -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 8%, #000 92%, transparent 100%);
+        mask-image: linear-gradient(90deg, transparent 0%, #000 8%, #000 92%, transparent 100%);
+    }
+    .hero-col-b { display: none; }
+    .hero-track {
+        flex-direction: row;
+        width: max-content;
+        padding: 0 var(--gap) 0 0;
+        animation-name: heroDriftLeft;
+        animation-duration: 36s;
+    }
+    .hero-track li { width: clamp(220px, 56vw, 280px); }
+}
+@media (max-width: 620px) {
+    .hero .hero-actions { gap: .6rem; }
+    .hero .btn-lg { flex: 1 1 auto; padding: .9rem 1.15rem; font-size: .96rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .hero-anim,
+    .hero-mark,
+    .hero-track,
+    .hero-live::after { animation: none; }
+    .hero .btn,
+    .hero-card,
+    .hero-card-media img { transition: none; }
+    .hero .btn:hover,
+    .hero-card:hover,
+    .hero-card:hover .hero-card-media img { transform: none; }
+}
+
