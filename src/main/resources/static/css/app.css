@@ -839,6 +839,32 @@ a:hover { text-decoration: underline; }
 .field-error { color: var(--danger); font-size: .8rem; margin-top: .3rem; }
 .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-3); }
 
+/* ---------- Password show/hide (added by js/password-toggle.js) ---------- */
+.password-field { position: relative; }
+.password-field .input { padding-right: 2.9rem; }
+.password-field input::-ms-reveal,
+.password-field input::-ms-clear { display: none; }
+.password-toggle {
+    position: absolute;
+    top: 50%;
+    right: .4rem;
+    transform: translateY(-50%);
+    display: inline-grid;
+    place-items: center;
+    width: 2.2rem;
+    height: 2.2rem;
+    padding: 0;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--ink-soft);
+    cursor: pointer;
+    transition: color .15s ease, background .15s ease;
+}
+.password-toggle:hover { color: var(--ink); background: rgba(29, 29, 31, .06); }
+.password-toggle[aria-pressed="true"] { color: var(--ink); }
+.password-toggle:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(255, 203, 5, .45); }
+
 /* ---------- Alerts / flash ---------- */
 .alert { padding: .8rem 1rem; border-radius: 10px; margin-bottom: var(--space-3); font-size: .92rem; border: 1px solid transparent; }
 .alert-success { background: #e7f6ec; color: var(--success); border-color: #b8e6c6; }
