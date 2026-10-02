@@ -103,6 +103,24 @@
                 <button class="btn btn-ghost" type="submit">Upload</button>
             </form>
         </div>
+
+        <div class="card" id="delete-account" style="margin-top:var(--space-4);border-color:#f7c3c6">
+            <h3>Delete my account</h3>
+            <p class="muted">
+                Deleting your account erases your name, email, phone number, NIC, uploaded documents and
+                alerts, and you will no longer be able to sign in. Past invoices stay on record without
+                your personal details. This cannot be undone.
+            </p>
+
+            <div class="alert alert-danger" th:unless="${deletionCheck.allowed()}">
+                <strong>You can't delete your account yet.</strong>
+                Please finish the business you have left behind first:
+                <ul style="margin:.5rem 0 .5rem 1.2rem;padding:0">
+                    <li th:each="reason : ${deletionCheck.reasons()}" th:text="${reason}">reason</li>
+                </ul>
+                Once these are done you can delete your account from this page.
+            </div>
+        </div>
     </div>
 </section>
 
