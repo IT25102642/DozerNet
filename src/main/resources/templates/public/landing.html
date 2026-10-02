@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/common :: head('Home')}"></head>
+<body class="page-home">
+<nav th:replace="~{fragments/common :: navbar}"></nav>
+
+<!-- ===================== HERO ===================== -->
+<header class="hero">
+    <div class="container hero-grid">
+        <div class="hero-copy">
+            <p class="hero-eyebrow hero-anim" style="--d:0">
+                <span class="hero-live" aria-hidden="true"></span>
+                <span th:text="|${availableMachines} machines ready to book|">22 machines ready to book</span>
+            </p>
+            <h1 class="hero-title hero-anim" style="--d:1">
+                <span class="hero-line">Heavy machines,</span>
+                <span class="hero-line">booked in <span class="hero-mark">minutes</span>.</span>
+            </h1>
+            <p class="hero-lede hero-anim" style="--d:2">
+                Find a verified JCB near your site, pick your dates and get a licensed operator —
+                all online, without the phone chase.
+            </p>
+            <div class="hero-actions hero-anim" style="--d:3">
+                <a class="btn btn-primary btn-lg" th:href="@{/machines}">Browse machines</a>
+                <a class="btn btn-lg hero-btn-glass" th:href="@{/how-it-works}">How it works</a>
+            </div>
+            <ul class="hero-trust hero-anim" style="--d:4" role="list">
+                <li><span class="hero-check" aria-hidden="true"></span>Verified machines</li>
+                <li><span class="hero-check" aria-hidden="true"></span>Licensed operators</li>
+                <li><span class="hero-check" aria-hidden="true"></span>Clear daily rates</li>
+            </ul>
+        </div>
+
+        <div class="hero-showcase hero-anim" style="--d:2" role="region" aria-label="Machines available now">
+            <div class="hero-col hero-col-a">
+                <ul class="hero-track" role="list">
+                    <th:block th:each="pass : ${#numbers.sequence(0, 1)}">
+                        <li th:each="m : ${showcaseA}" th:attr="aria-hidden=${pass == 1} ? 'true' : null">
+                            <a class="hero-card" th:href="@{'/machines/view/' + ${m.id}}"
+                               th:attr="tabindex=${pass == 1} ? '-1' : null">
+                                <span class="hero-card-media">
+                                    <img th:src="@{${m.imageUrl}}" th:alt="${m.model}" width="1200" height="800" decoding="async"/>
+                                    <span class="hero-card-status">Available</span>
+                                </span>
+                                <span class="hero-card-body">
+                                    <span class="hero-card-title" th:text="${m.model}">JCB 3CX Backhoe Loader</span>
+                                    <span class="hero-card-meta">
+                                        <span th:text="${m.type.displayName}">Backhoe Loader</span> &middot;
+                                        <span th:text="${m.location}">Colombo</span>
+                                    </span>
+                                    <span class="hero-card-foot">
+                                        <span class="hero-card-price"><span th:text="${currencySymbol}">Rs.</span> <span th:text="${#numbers.formatDecimal(m.dailyRate, 1, 'COMMA', 0, 'POINT')}">18,000</span><small>/day</small></span>
+                                        <span class="hero-card-go" aria-hidden="true">&rarr;</span>
+                                    </span>
+                                </span>
+                            </a>
+                        </li>
+                    </th:block>
+                </ul>
+            </div>
+            <div class="hero-col hero-col-b">
+                <ul class="hero-track" role="list">
+                    <th:block th:each="pass : ${#numbers.sequence(0, 1)}">
+                        <li th:each="m : ${showcaseB}" th:attr="aria-hidden=${pass == 1} ? 'true' : null">
+                            <a class="hero-card" th:href="@{'/machines/view/' + ${m.id}}"
+                               th:attr="tabindex=${pass == 1} ? '-1' : null">
+                                <span class="hero-card-media">
+                                    <img th:src="@{${m.imageUrl}}" th:alt="${m.model}" width="1200" height="800" decoding="async"/>
+                                    <span class="hero-card-status">Available</span>
+                                </span>
+                                <span class="hero-card-body">
+                                    <span class="hero-card-title" th:text="${m.model}">JCB 3CX Backhoe Loader</span>
+                                    <span class="hero-card-meta">
+                                        <span th:text="${m.type.displayName}">Backhoe Loader</span> &middot;
+                                        <span th:text="${m.location}">Colombo</span>
+                                    </span>
+                                    <span class="hero-card-foot">
+                                        <span class="hero-card-price"><span th:text="${currencySymbol}">Rs.</span> <span th:text="${#numbers.formatDecimal(m.dailyRate, 1, 'COMMA', 0, 'POINT')}">18,000</span><small>/day</small></span>
+                                        <span class="hero-card-go" aria-hidden="true">&rarr;</span>
+                                    </span>
+                                </span>
+                            </a>
+                        </li>
+                    </th:block>
+                </ul>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- ===================== HIGHLIGHTS ===================== -->
+<section id="highlights" class="section">
+    <div class="container grid grid-4 text-center">
+        <div class="reveal">
+            <div class="stat" th:text="${availableMachines}">0</div>
+            <p>Machines ready to book</p>
+        </div>
+        <div class="reveal">
+            <div class="stat">Same day</div>
+            <p>Request a rental online</p>
+        </div>
+        <div class="reveal">
+            <div class="stat">Verified</div>
+            <p>Checked fleet &amp; operators</p>
+        </div>
+        <div class="reveal">
+            <div class="stat">Clear rates</div>
+            <p>Daily pricing in Sri Lankan Rs.</p>
+        </div>
+    </div>
+</section>
+
+<!-- ===================== FEATURES ===================== -->
+<section class="section" style="background:var(--surface);border-block:1px solid var(--line)">
+    <div class="container">
+        <div class="text-center" style="max-width:60ch;margin:0 auto var(--space-5)">
+            <p class="eyebrow">Why DozerNet</p>
+            <h2>One verified platform. Shared, up-to-date information.</h2>
+            <p class="lead" style="margin:0 auto">JCB rental workflows are scattered across calls and messages. DozerNet brings booking, fleet, operators, maintenance and payments together.</p>
+        </div>
+        <div class="grid grid-3">
+            <div class="card card-hover reveal">
+                <h3>Search &amp; book online</h3>
+                <p>Check real-time availability and book a machine for your dates &mdash; no phone tag, no double-bookings.</p>
+            </div>
+            <div class="card card-hover reveal">
+                <h3>Verified fleet &amp; owners</h3>
+                <p>Company and admin-verified private machines in one trusted inventory with live availability.</p>
+            </div>
+            <div class="card card-hover reveal">
+                <h3>Qualified operators</h3>
+                <p>Every job is carried out by a verified, licensed operator assigned to your booking.</p>
+            </div>
+            <div class="card card-hover reveal">
+                <h3>Maintenance aware</h3>
+                <p>Unsafe or overdue machines are automatically kept out of the booking pool.</p>
+            </div>
+            <div class="card card-hover reveal">
+                <h3>Transparent payments</h3>
+                <p>Invoices are generated on completion, with clear, traceable payment records.</p>
+            </div>
+            <div class="card card-hover reveal">
+                <h3>Admin oversight</h3>
+                <p>Approvals, verifications and reports in a single dashboard for the whole operation.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===================== JOB USE CATEGORIES ===================== -->
+<section id="job-uses" class="job-uses" aria-labelledby="job-uses-title">
+    <div class="container job-uses-wrap">
+        <div class="job-uses-head reveal">
+            <div>
+                <p class="eyebrow">Rental categories</p>
+                <h2 id="job-uses-title">What's the job?</h2>
+            </div>
+            <p class="job-uses-intro">
+                Pick the work you need done and we'll show every verified machine that fits.
+                <a th:href="@{/machines}">Browse all machines <span aria-hidden="true">&rarr;</span></a>
+            </p>
+        </div>
+
+        <div class="job-uses-panel reveal">
+            <ul class="job-uses-list" role="list">
+                <li th:each="cat, iter : ${jobCategories}"
+                    class="job-uses-item"
+                    th:classappend="${iter.first} ? 'is-active'"
+                    th:attr="data-image=@{${cat.imagePath}}, data-name=${cat.name}, data-count=${cat.machineCount}">
+                    <a class="job-uses-link" th:href="@{/machines(job=${cat.slug})}">
+                        <span class="job-uses-num" aria-hidden="true" th:text="${#numbers.formatInteger(iter.count, 2)}">01</span>
+                        <span class="job-uses-text">
+                            <span class="job-uses-name" th:text="${cat.name}">Digging</span>
+                            <span class="job-uses-types">
+                                <th:block th:each="t, ti : ${cat.types}"><span th:text="${t.displayName}">Excavator</span><th:block th:unless="${ti.last}"> &middot; </th:block></th:block>
+                            </span>
+                        </span>
+                        <span class="job-uses-count"><span th:text="${cat.machineCount}">5</span><span class="job-uses-sr"> machines</span></span>
+                        <span class="job-uses-go" aria-hidden="true">&rarr;</span>
+                        <span class="job-uses-progress" aria-hidden="true"></span>
+                    </a>
+                </li>
+            </ul>
+
+            <div class="job-uses-stage">
+                <img class="job-uses-photo is-active" data-role="active"
+                     th:src="@{${jobCategories[0].imagePath}}" alt="" width="1200" height="800"/>
+                <img class="job-uses-photo" data-role="next"
+                     th:src="@{${jobCategories[0].imagePath}}" alt="" width="1200" height="800"/>
+                <div class="job-uses-caption" aria-hidden="true">
+                    <div>
+                        <p class="job-uses-caption-name" data-role="name" th:text="${jobCategories[0].name}">Digging</p>
+                        <p class="job-uses-caption-meta">
+                            <span data-role="count" th:text="${jobCategories[0].machineCount}">5</span> machines ready to book
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===================== CTA ===================== -->
+<section class="section cta-section">
+    <div class="container">
+        <div class="cta-band reveal">
+            <p class="eyebrow">Get started</p>
+            <h2>Ready for your next site?</h2>
+            <p>Create an account and book a verified machine in minutes.</p>
+            <div class="hero-actions">
+                <a class="btn btn-primary btn-lg" th:href="@{/register}">Get started</a>
+                <a class="btn btn-ghost btn-lg" th:href="@{/machines}">Browse fleet</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<footer th:replace="~{fragments/common :: footer}"></footer>
+<div th:replace="~{fragments/common :: reveal-script}"></div>
+<script th:src="@{/js/job-uses.js}"></script>
+<script th:src="@{/js/stat-counter.js}"></script>
+</body>
+</html>
