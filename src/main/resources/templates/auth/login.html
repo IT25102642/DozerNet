@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/common :: head('Sign in')}"></head>
+<body>
+<nav th:replace="~{fragments/common :: navbar}"></nav>
+
+<div class="auth-wrap">
+    <div class="card auth-card">
+        <p class="eyebrow">Welcome back</p>
+        <h1 style="font-size:1.8rem">Sign in</h1>
+
+        <div class="alert alert-danger" th:if="${param.error}">Invalid email or password.</div>
+        <div class="alert alert-success" th:if="${param.loggedOut}">You have been signed out.</div>
+        <div class="alert alert-success" th:if="${param.registered}">Account created. Please sign in.</div>
+
+        <form th:action="@{/login}" method="post">
+            <div class="field">
+                <label for="email">Email</label>
+                <input class="input" type="email" id="email" name="email" required autofocus placeholder="you@example.com"/>
+            </div>
+            <div class="field">
+                <label for="password">Password</label>
+                <input class="input" type="password" id="password" name="password" required placeholder="Your password"/>
+            </div>
+            <button class="btn btn-primary btn-block" type="submit">Sign in</button>
+        </form>
+
+        <p class="muted" style="margin-top:var(--space-3);text-align:center">
+            New to DozerNet? <a th:href="@{/register}">Create an account</a>
+        </p>
+    </div>
+</div>
+
+<footer th:replace="~{fragments/common :: footer}"></footer>
+</body>
+</html>
