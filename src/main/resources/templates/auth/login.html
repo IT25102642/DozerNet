@@ -12,6 +12,7 @@
         <div class="alert alert-danger" th:if="${param.error}">Invalid email or password.</div>
         <div class="alert alert-success" th:if="${param.loggedOut}">You have been signed out.</div>
         <div class="alert alert-success" th:if="${param.registered}">Account created. Please sign in.</div>
+        <div class="alert alert-success" th:if="${param.deleted}">Your account has been deleted. We're sorry to see you go.</div>
 
         <form th:action="@{/login}" method="post">
             <div class="field">
