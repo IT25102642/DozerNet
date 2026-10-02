@@ -8,7 +8,11 @@ import com.dozernet.module1_customer.dto.ProfileForm;
 import com.dozernet.module1_customer.service.AccountDeletionService;
 import com.dozernet.module1_customer.service.CustomerService;
 import com.dozernet.module6_payment.service.PaymentService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -116,5 +120,26 @@ public class CustomerController {
             ra.addFlashAttribute("error", ex.getMessage());
         }
         return "redirect:/customer/profile";
+    }
+
+    /**
+     * Deletes the signed-in customer's own account. Refused (with an explanation)
+     * while bookings or invoices are still open. On success the session is ended.
+     */
+    @PostMapping("/account/delete")
+    public String deleteAccount(@RequestParam(required = false) String password,
+                                @RequestParam(defaultValue = "false") boolean confirm,
+                                HttpServletRequest request,
+                                HttpServletResponse response,
+                                RedirectAttributes ra) {
+        try {
+            accountDeletionService.deleteOwnAccount(currentUserService.require(), password, confirm);
+        } catch (BusinessRuleException ex) {
+            ra.addFlashAttribute("error", ex.getMessage());
+            return "redirect:/customer/profile";
+        }
+        new SecurityContextLogoutHandler().logout(request, response,
+                SecurityContextHolder.getContext().getAuthentication());
+        return "redirect:/login?deleted";
     }
 }
