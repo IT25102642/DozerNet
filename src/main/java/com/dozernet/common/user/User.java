@@ -81,6 +81,14 @@ public class User extends BaseEntity {
     @Column(nullable = false)
     private boolean contactUnreachable = false;
 
+    /**
+     * Set when the account holder deleted their account. Personal data is
+     * scrubbed, but the row stays so past bookings, invoices and the audit
+     * trail keep a valid reference. Deleted accounts can never sign in.
+     */
+    @Column(nullable = false)
+    private boolean deleted = false;
+
     public User() {
     }
 
@@ -204,5 +212,13 @@ public class User extends BaseEntity {
 
     public void setContactUnreachable(boolean contactUnreachable) {
         this.contactUnreachable = contactUnreachable;
+    }
+
+    public boolean isDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
     }
 }
