@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/common :: head('Admin dashboard')}"></head>
+<body>
+<nav th:replace="~{fragments/common :: navbar}"></nav>
+<div th:replace="~{fragments/common :: flash}"></div>
+
+<section class="section">
+    <div class="container">
+        <div class="page-head">
+            <div>
+                <p class="eyebrow">Administrator</p>
+                <h1>Dashboard</h1>
+            </div>
+        </div>
+
+        <div class="alert alert-success" th:if="${awaitingOperator != null and !#lists.isEmpty(awaitingOperator)}"
+             style="margin-bottom:var(--space-4)">
+            <strong>Action needed:</strong>
+            <span th:text="${#lists.size(awaitingOperator)}">1</span>
+            customer payment(s) completed — assign an operator.
+            <a th:href="@{/admin/assignments}" style="font-weight:600;margin-left:.35rem">Assign now →</a>
+            <ul style="margin:.6rem 0 0;padding-left:1.2rem">
+                <li th:each="b : ${awaitingOperator}">
+                    <span th:text="${b.customer.fullName}">Customer</span>
+                    &middot;
+                    <span th:text="${b.machine.model}">Machine</span>
+                    &middot;
+                    <span th:text="${b.startDate}">start</span>
+                    &rarr;
+                    <span th:text="${b.endDate}">end</span>
+                    <span th:if="${b.jobSiteLabel != null and !#strings.isEmpty(b.jobSiteLabel)}">
+                        &middot; <span th:text="${b.jobSiteLabel}">site</span>
+                    </span>
+                </li>
+            </ul>
+        </div>
+
+        <div class="stat-grid">
+            <a class="card card-hover" th:href="@{/admin/bookings}" style="text-decoration:none;color:inherit">
+                <div class="stat" th:text="${stats.pendingBookings}">0</div><p>Pending bookings</p>
+            </a>
+            <a class="card card-hover" th:href="@{/admin/assignments}" style="text-decoration:none;color:inherit">
+                <div class="stat" th:text="${stats.awaitingOperatorAssignment}">0</div><p>Ready to assign</p>
+            </a>
+            <a class="card card-hover" th:href="@{/admin/listings}" style="text-decoration:none;color:inherit">
+                <div class="stat" th:text="${stats.pendingListings}">0</div><p>Listings to approve</p>
+            </a>
+            <a class="card card-hover" th:href="@{/admin/operators}" style="text-decoration:none;color:inherit">
+                <div class="stat" th:text="${stats.pendingOperators}">0</div><p>Operators to verify</p>
+            </a>
+            <a class="card card-hover" th:href="@{/admin/invoices}" style="text-decoration:none;color:inherit">
+                <div class="stat" th:text="${stats.unpaidInvoices}">0</div><p>Unpaid invoices</p>
+            </a>
+            <a class="card card-hover" th:href="@{/admin/maintenance}" style="text-decoration:none;color:inherit">
+                <div class="stat" th:text="${stats.machinesDueForService}">0</div><p>Due for service</p>
+            </a>
+        </div>
+
+        <div class="grid grid-2" style="margin-bottom:var(--space-5)">
+            <div class="card">
+                <p class="muted" style="margin:0">Revenue collected</p>
+                <div class="stat"><span th:text="${currencySymbol}">Rs.</span> <span th:text="${#numbers.formatDecimal(stats.revenueCollected,1,'COMMA',2,'POINT')}">0</span></div>
+            </div>
+            <div class="card">
+                <p class="muted" style="margin:0">Outstanding balance</p>
+                <div class="stat"><span th:text="${currencySymbol}">Rs.</span> <span th:text="${#numbers.formatDecimal(stats.outstanding,1,'COMMA',2,'POINT')}">0</span></div>
+            </div>
+        </div>
+
+        <div class="page-head" style="margin-bottom:var(--space-3)">
+            <div>
+                <p class="eyebrow">Live today</p>
+                <h2 style="margin:0;font-size:1.35rem">Fleet whereabouts</h2>
+            </div>
+            <a class="btn btn-ghost btn-sm" th:href="@{/admin/bookings}">All bookings</a>
+        </div>
+        <p class="muted" th:if="${#lists.isEmpty(deployments)}" style="margin-bottom:var(--space-5)">
+            No machines on an approved job site today.
+        </p>
+        <div class="table-wrap" th:unless="${#lists.isEmpty(deployments)}" style="margin-bottom:var(--space-5)">
+            <table class="data">
+                <thead>
+                <tr><th>Machine</th><th>District</th><th>Site</th><th>Customer</th><th>Dates</th><th>Status</th></tr>
+                </thead>
+                <tbody>
+                <tr th:each="d : ${deployments}">
+                    <td th:text="${d.machine.model}">Machine</td>
+                    <td><span class="pill pill-booked" th:text="${d.jobSiteDistrict}">District</span></td>
+                    <td th:text="${d.jobSiteAddress}">Site</td>
+                    <td th:text="${d.customer.fullName}">Customer</td>
+                    <td><span th:text="${d.startDate}">start</span> &rarr; <span th:text="${d.endDate}">end</span></td>
+                    <td><span class="pill" th:classappend="${'pill-' + d.status.name().toLowerCase()}" th:text="${d.status.displayName}">Status</span></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h3>Manage</h3>
+        <div class="grid grid-4">
+            <a class="card card-hover" th:href="@{/admin/machines}" style="text-decoration:none;color:inherit"><h3>Fleet</h3><p class="muted">Company & private machines</p></a>
+            <a class="card card-hover" th:href="@{/admin/bookings}" style="text-decoration:none;color:inherit"><h3>Bookings</h3><p class="muted">Approve or reject requests</p></a>
+            <a class="card card-hover" th:href="@{/admin/assignments}" style="text-decoration:none;color:inherit"><h3>Assignments</h3><p class="muted">Assign operators to jobs</p></a>
+            <a class="card card-hover" th:href="@{/admin/operators}" style="text-decoration:none;color:inherit"><h3>Operators</h3><p class="muted">Add & verify operators</p></a>
+            <a class="card card-hover" th:href="@{/admin/maintenance}" style="text-decoration:none;color:inherit"><h3>Maintenance</h3><p class="muted">Schedule & service history</p></a>
+            <a class="card card-hover" th:href="@{/admin/invoices}" style="text-decoration:none;color:inherit"><h3>Invoices</h3><p class="muted">Billing & payments</p></a>
+            <a class="card card-hover" th:href="@{/admin/reports}" style="text-decoration:none;color:inherit"><h3>Reports</h3><p class="muted">Bookings & revenue</p></a>
+            <a class="card card-hover" th:href="@{/admin/users}" style="text-decoration:none;color:inherit"><h3>Users</h3><p class="muted">Manage accounts</p></a>
+            <a class="card card-hover" th:href="@{/admin/inspections}" style="text-decoration:none;color:inherit"><h3>Inspections</h3><p class="muted">Returns &amp; damage</p></a>
+            <a class="card card-hover" th:href="@{/admin/audit}" style="text-decoration:none;color:inherit"><h3>Audit log</h3><p class="muted">Who changed what</p></a>
+        </div>
+    </div>
+</section>
+
+<footer th:replace="~{fragments/common :: footer}"></footer>
+</body>
+</html>
