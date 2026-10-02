@@ -90,6 +90,8 @@ public class CustomerService {
         user.setPhone(phone);
         // identityCardNumber is immutable after registration
         userRepository.save(user);
+        // They have just reviewed their contact details, so drop the "unreachable" warning.
+        clearContactWarning(user);
     }
 
     @Transactional
