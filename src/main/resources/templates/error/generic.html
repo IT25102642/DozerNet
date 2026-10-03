@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/common :: head('Something went wrong')}"></head>
+<body>
+<nav th:replace="~{fragments/common :: navbar}"></nav>
+
+<div class="auth-wrap">
+    <div class="card auth-card text-center">
+        <div class="stat" th:text="${code} ?: 'Oops'">Oops</div>
+        <h1 style="font-size:1.5rem" th:text="${message} ?: 'Something went wrong.'">Something went wrong.</h1>
+        <a class="btn btn-primary" th:href="@{/}">Back to home</a>
+    </div>
+</div>
+
+<footer th:replace="~{fragments/common :: footer}"></footer>
+</body>
+</html>

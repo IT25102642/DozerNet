@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/common :: head('How it works')}"></head>
+<body>
+<nav th:replace="~{fragments/common :: navbar}"></nav>
+
+<section class="section">
+    <div class="container form-panel">
+        <p class="eyebrow">How it works</p>
+        <h1>Book a JCB in four steps</h1>
+
+        <div class="grid" style="margin-top:var(--space-5);gap:var(--space-3)">
+            <div class="card reveal"><h3>1 &middot; Create an account</h3><p>Register as a customer and verify your details. <a th:href="@{/register/owner}">Owners</a> and <a th:href="@{/register/driver}">operators</a> can also register to join the platform.</p></div>
+            <div class="card reveal"><h3>2 &middot; Find a machine</h3><p>Search and filter available JCBs by type, location and date, then check real-time availability.</p></div>
+            <div class="card reveal"><h3>3 &middot; Request a booking</h3><p>Pick your dates and submit a booking request. The admin reviews and approves it &mdash; conflicts are prevented automatically.</p></div>
+            <div class="card reveal"><h3>4 &middot; Get the job done</h3><p>A verified operator is assigned, job status is tracked, and an invoice is generated on completion.</p></div>
+        </div>
+
+        <div class="text-center" style="margin-top:var(--space-6)">
+            <a class="btn btn-primary" th:href="@{/register}">Create your account</a>
+        </div>
+    </div>
+</section>
+
+<footer th:replace="~{fragments/common :: footer}"></footer>
+<div th:replace="~{fragments/common :: reveal-script}"></div>
+</body>
+</html>

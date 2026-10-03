@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/common :: head('About')}"></head>
+<body>
+<nav th:replace="~{fragments/common :: navbar}"></nav>
+
+<section class="section">
+    <div class="container form-panel">
+        <p class="eyebrow">About</p>
+        <h1>DozerNet</h1>
+        <p class="lead">A web-based JCB management system that replaces phone-based coordination with a transparent, centralised platform connecting customers, private owners, operators and administrators.</p>
+
+        <div class="grid grid-2" style="margin-top:var(--space-5)">
+            <div class="card reveal">
+                <h3>The problem</h3>
+                <p>Bookings, maintenance, operator and payment records sit in different places, coordinated over calls and messages &mdash; slow and error-prone.</p>
+            </div>
+            <div class="card reveal">
+                <h3>Our solution</h3>
+                <p>One verified platform with shared, up-to-date information for every stakeholder, built on solid object-oriented design.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<footer th:replace="~{fragments/common :: footer}"></footer>
+<div th:replace="~{fragments/common :: reveal-script}"></div>
+</body>
+</html>
