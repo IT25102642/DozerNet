@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/common :: head('Service history')}"></head>
+<body>
+<nav th:replace="~{fragments/common :: navbar}"></nav>
+
+<section class="section">
+    <div class="container">
+        <a class="muted" th:href="@{/admin/maintenance}">&larr; Back to maintenance</a>
+        <div class="page-head">
+            <div>
+                <p class="eyebrow">Service history</p>
+                <h1 th:text="${machine.model}">Machine</h1>
+                <p class="muted" th:text="${machine.registrationNumber} + ' · ' + ${machine.type.displayName}">reg</p>
+            </div>
+        </div>
+
+        <p class="muted" th:if="${#lists.isEmpty(records)}">No service history for this machine yet.</p>
+
+        <div class="table-wrap" th:unless="${#lists.isEmpty(records)}">
+            <table class="data">
+                <thead>
+                <tr><th>Scheduled</th><th>Completed</th><th>Description</th><th>Parts used</th><th>Cost</th><th>Status</th></tr>
+                </thead>
+                <tbody>
+                <tr th:each="r : ${records}">
+                    <td th:text="${r.scheduledDate}">date</td>
+                    <td th:text="${r.completedDate} ?: '-'">-</td>
+                    <td th:text="${r.description}">desc</td>
+                    <td th:text="${r.partsUsed} ?: '-'">-</td>
+                    <td>
+                        <span th:if="${r.cost != null}"><span th:text="${currencySymbol}">Rs.</span> <span th:text="${#numbers.formatDecimal(r.cost,1,'COMMA',2,'POINT')}">0</span></span>
+                        <span th:unless="${r.cost != null}">-</span>
+                    </td>
+                    <td>
+                        <span class="pill pill-completed" th:if="${r.status.name() == 'COMPLETED'}">Completed</span>
+                        <span class="pill pill-maintenance" th:unless="${r.status.name() == 'COMPLETED'}">Scheduled</span>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+<footer th:replace="~{fragments/common :: footer}"></footer>
+</body>
+</html>

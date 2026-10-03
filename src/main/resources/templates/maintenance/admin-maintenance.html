@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/common :: head('Maintenance')}"></head>
+<body>
+<nav th:replace="~{fragments/common :: navbar}"></nav>
+<div th:replace="~{fragments/common :: flash}"></div>
+
+<section class="section">
+    <div class="container">
+        <div class="page-head">
+            <div>
+                <p class="eyebrow">Admin &middot; Maintenance</p>
+                <h1>Maintenance &amp; service</h1>
+            </div>
+            <form th:action="@{/admin/maintenance/remind}" method="post">
+                <button class="btn btn-ghost" type="submit">Send service reminders</button>
+            </form>
+        </div>
+
+        <!-- Machines past the service interval -->
+        <div class="card" style="margin-bottom:var(--space-5)" th:unless="${#lists.isEmpty(dueForService)}">
+            <h3 style="margin-top:0">
+                Due for service
+                <span class="pill pill-maintenance" th:text="${#lists.size(dueForService)}">0</span>
+            </h3>
+            <p class="muted">
+                Nothing serviced in the last <span th:text="${serviceIntervalMonths}">3</span> months,
+                and no service already booked in.
+            </p>
+            <div class="table-wrap">
+                <table class="data">
+                    <thead><tr><th>Machine</th><th>Registration</th><th>Why</th><th></th></tr></thead>
+                    <tbody>
+                    <tr th:each="d : ${dueForService}">
+                        <td th:text="${d.machine.model}">Machine</td>
+                        <td th:text="${d.machine.registrationNumber}">REG</td>
+                        <td th:text="${d.reason}">Last serviced ...</td>
+                        <td><a class="btn btn-ghost btn-sm"
+                               th:href="@{'/admin/maintenance/history/' + ${d.machine.id}}">History</a></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="grid grid-2" style="align-items:start">
+            <!-- Schedule form -->
+            <div class="card">
+                <h3>Schedule maintenance</h3>
+                <form th:action="@{/admin/maintenance/schedule}" th:object="${scheduleForm}" method="post" novalidate>
+                    <div class="field">
+                        <label for="machineId">Machine</label>
+                        <select class="select" id="machineId" th:field="*{machineId}">
+                            <option value="">Select a machine</option>
+                            <option th:each="m : ${machines}" th:value="${m.id}"
+                                    th:text="${m.model} + ' (' + ${m.registrationNumber} + ')'"></option>
+                        </select>
+                        <div class="field-error" th:if="${#fields.hasErrors('machineId')}" th:errors="*{machineId}"></div>
+                    </div>
+                    <div class="field">
+                        <label for="scheduledDate">Date</label>
+                        <input class="input" id="scheduledDate" type="date" th:field="*{scheduledDate}"/>
+                        <div class="field-error" th:if="${#fields.hasErrors('scheduledDate')}" th:errors="*{scheduledDate}"></div>
+                    </div>
+                    <div class="field">
+                        <label for="description">Description</label>
+                        <textarea class="textarea" id="description" rows="3" th:field="*{description}"
+                                  placeholder="e.g. 250-hour service, hydraulic inspection"></textarea>
+                        <div class="field-error" th:if="${#fields.hasErrors('description')}" th:errors="*{description}"></div>
+                    </div>
+                    <button class="btn btn-primary" type="submit">Schedule</button>
+                </form>
+            </div>
+
+            <!-- Records -->
+            <div>
+                <div class="table-wrap">
+                    <table class="data">
+                        <thead>
+                        <tr><th>Machine</th><th>Date</th><th>Description</th><th>Status</th><th>Action</th></tr>
+                        </thead>
+                        <tbody>
+                        <tr th:if="${#lists.isEmpty(records)}"><td colspan="5" class="muted">No maintenance records yet.</td></tr>
+                        <tr th:each="r : ${records}">
+                            <td>
+                                <a th:href="@{'/admin/maintenance/history/' + ${r.machine.id}}" th:text="${r.machine.model}">Machine</a>
+                            </td>
+                            <td th:text="${r.scheduledDate}">date</td>
+                            <td th:text="${r.description}">desc</td>
+                            <td>
+                                <span class="pill pill-completed" th:if="${r.status.name() == 'COMPLETED'}">Completed</span>
+                                <span class="pill pill-maintenance" th:unless="${r.status.name() == 'COMPLETED'}">Scheduled</span>
+                            </td>
+                            <td>
+                                <details th:if="${r.status.name() == 'SCHEDULED'}">
+                                    <summary class="btn btn-ghost btn-sm">Complete</summary>
+                                    <form th:action="@{'/admin/maintenance/' + ${r.id} + '/complete'}" method="post"
+                                          style="margin-top:.5rem;display:grid;gap:.4rem;min-width:220px">
+                                        <input class="input" type="text" name="partsUsed" placeholder="Parts used (optional)"/>
+                                        <input class="input" type="number" step="0.01" min="0" name="cost" placeholder="Cost (Rs.)"/>
+                                        <label style="font-size:.85rem"><input type="checkbox" name="returnToService" value="true"/> Return machine to service</label>
+                                        <button class="btn btn-primary btn-sm" type="submit">Save</button>
+                                    </form>
+                                </details>
+                                <span class="muted" th:if="${r.status.name() == 'COMPLETED'}"
+                                      th:text="${r.completedDate}">done</span>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<footer th:replace="~{fragments/common :: footer}"></footer>
+</body>
+</html>
