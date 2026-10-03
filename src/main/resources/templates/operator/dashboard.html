@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/common :: head('Operator dashboard')}"></head>
+<body>
+<nav th:replace="~{fragments/common :: navbar}"></nav>
+<div th:replace="~{fragments/common :: flash}"></div>
+
+<section class="section">
+    <div class="container">
+        <div class="page-head">
+            <div>
+                <p class="eyebrow">Operator</p>
+                <h1>My jobs</h1>
+            </div>
+        </div>
+
+        <p class="muted" th:if="${#lists.isEmpty(assignments)}">You have no assigned jobs yet.</p>
+
+        <div class="table-wrap" th:unless="${#lists.isEmpty(assignments)}">
+            <table class="data">
+                <thead>
+                <tr><th>Machine</th><th>Customer</th><th>Dates</th><th>Job status</th><th>Update</th></tr>
+                </thead>
+                <tbody>
+                <tr th:each="a : ${assignments}">
+                    <td th:text="${a.booking.machine.model}">Machine</td>
+                    <td th:text="${a.booking.customer.fullName}">Customer</td>
+                    <td><span th:text="${a.booking.startDate}">start</span> &rarr; <span th:text="${a.booking.endDate}">end</span></td>
+                    <td><span class="pill"
+                              th:classappend="${a.jobStatus.name() == 'COMPLETED'} ? 'pill-completed' : (${a.jobStatus.name() == 'IN_PROGRESS'} ? 'pill-pending' : 'pill-booked')"
+                              th:text="${a.jobStatus.displayName}">Status</span></td>
+                    <td>
+                        <form th:if="${a.jobStatus.name() != 'COMPLETED'}"
+                              th:action="@{'/operator/assignments/' + ${a.id} + '/status'}" method="post"
+                              style="display:flex;gap:.3rem">
+                            <select class="select" name="status" style="padding:.35rem .5rem">
+                                <option th:if="${a.jobStatus.name() == 'ASSIGNED'}" value="IN_PROGRESS">Start job (In progress)</option>
+                                <option th:if="${a.jobStatus.name() == 'IN_PROGRESS'}" value="COMPLETED">Mark completed</option>
+                            </select>
+                            <button class="btn btn-primary btn-sm" type="submit">Update</button>
+                        </form>
+                        <span class="muted" th:if="${a.jobStatus.name() == 'COMPLETED'}">Done</span>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+<footer th:replace="~{fragments/common :: footer}"></footer>
+</body>
+</html>
