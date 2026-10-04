@@ -50,8 +50,6 @@ public interface MachineRepository extends JpaRepository<Machine, Long> {
 
     List<Machine> findByVerifiedFalse();
 
-    List<Machine> findByStatus(MachineStatus status);
-
     boolean existsByRegistrationNumber(String registrationNumber);
 
     long countByStatus(MachineStatus status);
