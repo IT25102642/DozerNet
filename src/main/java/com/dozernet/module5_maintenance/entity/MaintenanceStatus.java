@@ -4,16 +4,16 @@ package com.dozernet.module5_maintenance.entity;
  * Whether a maintenance job is upcoming or finished.
  */
 public enum MaintenanceStatus {
-    SCHEDULED("Scheduled"), //Possible enum value
-    COMPLETED("Completed"); //Possible enum value
+    SCHEDULED("Scheduled"),
+    COMPLETED("Completed");
 
-    private final String displayName; //'final' indicates that the value cannot be changed after assignment
+    private final String displayName;
 
-    MaintenanceStatus(String displayName) { //Assigns the constructor value to the class variable.
+    MaintenanceStatus(String displayName) {
         this.displayName = displayName;
     }
 
-    public String getDisplayName() { //(Getter) Allow other classes to read the display name
+    public String getDisplayName() {
         return displayName;
     }
 }

@@ -194,14 +194,6 @@ public class OperatorService {
                 .toList();
     }
 
-    /** Verified operators with no clashing job over the booking's dates. */
-    public List<OperatorProfile> availableOperatorsFor(Booking booking) {
-        return suggestionsFor(booking).stream()
-                .filter(OperatorOption::available)
-                .map(OperatorOption::profile)
-                .toList();
-    }
-
     private OperatorOption toOption(OperatorProfile profile, Booking booking) {
         List<Assignment> clashes = assignmentRepository.findOperatorClashes(
                 profile.getUser(), booking.getStartDate(), booking.getEndDate());
