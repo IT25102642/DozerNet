@@ -129,7 +129,13 @@ public class FleetService {
             throw new BusinessRuleException(
                     "Cannot delete a machine that has bookings. Mark it unavailable instead.");
         }
-        machineRepository.delete(m);
+        try {
+            machineRepository.delete(m);
+            machineRepository.flush();
+        } catch (org.springframework.dao.DataIntegrityViolationException ex) {
+            throw new BusinessRuleException(
+                    "Cannot delete a machine that has maintenance or booking history. Mark it unavailable instead.");
+        }
     }
 
     // ---------- Verification ----------
