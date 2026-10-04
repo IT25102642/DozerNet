@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/common :: head('My bookings')}"></head>
+<body>
+<nav th:replace="~{fragments/common :: navbar}"></nav>
+<div th:replace="~{fragments/common :: flash}"></div>
+
+<section class="section">
+    <div class="container">
+        <div class="page-head">
+            <div>
+                <p class="eyebrow">Customer</p>
+                <h1>My bookings</h1>
+            </div>
+            <a class="btn btn-primary" th:href="@{/machines}">Book another machine</a>
+        </div>
+
+        <p class="muted" th:if="${#lists.isEmpty(bookings)}">You have no bookings yet.</p>
+
+        <div class="table-wrap" th:unless="${#lists.isEmpty(bookings)}">
+            <table class="data">
+                <thead>
+                <tr><th>Machine</th><th>Job site</th><th>Dates</th><th>Days</th><th>Total</th><th>Status</th><th></th></tr>
+                </thead>
+                <tbody>
+                <tr th:each="b : ${bookings}">
+                    <td th:text="${b.machine.model}">Machine</td>
+                    <td>
+                        <strong th:text="${b.jobSiteDistrict}">District</strong><br/>
+                        <span class="muted" th:text="${b.jobSiteAddress}">Address</span>
+                    </td>
+                    <td><span th:text="${b.startDate}">start</span> &rarr; <span th:text="${b.endDate}">end</span></td>
+                    <td th:text="${b.days}">1</td>
+                    <td><span th:text="${currencySymbol}">Rs.</span> <span th:text="${#numbers.formatDecimal(b.totalAmount,1,'COMMA',2,'POINT')}">0</span></td>
+                    <td><span class="pill" th:classappend="${'pill-' + b.status.name().toLowerCase()}" th:text="${b.status.displayName}">Status</span></td>
+                    <td>
+                        <form th:if="${b.status.name() == 'PENDING'
+                                      or (b.status.name() == 'APPROVED' and unpaidInvoices != null and unpaidInvoices.containsKey(b.id))}"
+                              th:action="@{'/bookings/' + ${b.id} + '/cancel'}" method="post"
+                              onsubmit="return confirm('Cancel this booking?')">
+                            <button class="btn btn-danger btn-sm" type="submit">Cancel</button>
+                        </form>
+                        <a class="btn btn-primary btn-sm"
+                           th:if="${unpaidInvoices != null and unpaidInvoices.containsKey(b.id)}"
+                           th:href="@{'/customer/invoices/' + ${unpaidInvoices.get(b.id)} + '/pay'}">Pay now</a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+<footer th:replace="~{fragments/common :: footer}"></footer>
+</body>
+</html>

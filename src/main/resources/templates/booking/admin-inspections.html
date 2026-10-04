@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/common :: head('Return inspections')}"></head>
+<body>
+<nav th:replace="~{fragments/common :: navbar}"></nav>
+<div th:replace="~{fragments/common :: flash}"></div>
+
+<section class="section">
+    <div class="container">
+        <div class="page-head">
+            <div>
+                <p class="eyebrow">Admin &middot; Damage tracking</p>
+                <h1>Return inspections</h1>
+            </div>
+            <a class="btn btn-ghost" th:href="@{/admin/bookings}">Back to bookings</a>
+        </div>
+
+        <div class="stat-grid">
+            <div class="card">
+                <div class="stat" th:text="${#lists.size(inspections)}">0</div><p>Inspections filed</p>
+            </div>
+            <div class="card">
+                <div class="stat" th:text="${#lists.size(damaged)}">0</div><p>With damage reported</p>
+            </div>
+        </div>
+
+        <p class="muted" th:if="${#lists.isEmpty(inspections)}">
+            No return inspections have been filed yet. File one from a completed booking.
+        </p>
+
+        <div class="table-wrap" th:unless="${#lists.isEmpty(inspections)}">
+            <table class="data">
+                <thead>
+                <tr>
+                    <th>Filed</th><th>Machine</th><th>Customer</th><th>Damage</th>
+                    <th>Responsible</th><th>Est. repair</th><th>Notes</th><th>Photo</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="i : ${inspections}">
+                    <td th:text="${#temporals.format(i.createdAt, 'dd MMM yyyy')}">date</td>
+                    <td th:text="${i.booking.machine.model}">Machine</td>
+                    <td th:text="${i.booking.customer.fullName}">Customer</td>
+                    <td>
+                        <span class="pill pill-cancelled" th:if="${i.damageReported}">Damage</span>
+                        <span class="pill pill-completed" th:unless="${i.damageReported}">Clean</span>
+                    </td>
+                    <td th:text="${i.responsibleParty.displayName}">party</td>
+                    <td>
+                        <span th:if="${i.estimatedRepairCost != null}">
+                            <span th:text="${currencySymbol}">Rs.</span>
+                            <span th:text="${#numbers.formatDecimal(i.estimatedRepairCost,1,'COMMA',2,'POINT')}">0</span>
+                        </span>
+                        <span class="muted" th:if="${i.estimatedRepairCost == null}">&mdash;</span>
+                    </td>
+                    <td th:text="${i.damageReported} ? ${i.damageDescription} : ${i.notes}">notes</td>
+                    <td>
+                        <a th:if="${i.photo != null}" class="btn btn-ghost btn-sm"
+                           th:href="@{'/documents/' + ${i.photo.id}}" target="_blank">View</a>
+                        <span class="muted" th:if="${i.photo == null}">&mdash;</span>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+<footer th:replace="~{fragments/common :: footer}"></footer>
+</body>
+</html>
