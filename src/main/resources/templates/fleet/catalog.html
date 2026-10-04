@@ -61,7 +61,7 @@
                     <span th:text="${m.type.displayName}">Type</span>
                 </div>
                 <img th:if="${m.imageUrl != null and !m.imageUrl.isBlank()}"
-                     th:src="${m.imageUrl}" th:alt="${m.model}"/>
+                     th:src="${m.imageUrl}" th:attr="data-fallback=@{${m.fallbackImageUrl}}" th:alt="${m.model}"/>
                 <h3 style="margin-top:1rem" th:text="${m.model}">Model</h3>
                 <p class="muted" style="margin:0">
                     <span th:text="${m.type.displayName}">Type</span> &middot;

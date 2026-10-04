@@ -15,7 +15,7 @@
                     <span th:text="${machine.type.displayName}">Type</span>
                 </div>
                 <img th:if="${machine.imageUrl != null and !machine.imageUrl.isBlank()}"
-                     class="machine-detail-img" th:src="${machine.imageUrl}" th:alt="${machine.model}"/>
+                     class="machine-detail-img" th:src="${machine.imageUrl}" th:attr="data-fallback=@{${machine.fallbackImageUrl}}" th:alt="${machine.model}"/>
             </div>
             <div>
                 <p class="eyebrow" th:text="${machine.type.displayName}">Type</p>

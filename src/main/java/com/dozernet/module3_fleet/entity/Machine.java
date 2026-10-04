@@ -122,6 +122,34 @@ public class Machine extends BaseEntity {
         this.imageUrl = imageUrl;
     }
 
+    /**
+     * Standard photo for a machine type. Used as the default when a machine has no photo and
+     * as the fallback when its own photo URL is dead, so a card never shows a broken image.
+     */
+    public static String defaultImageFor(MachineType type) {
+        if (type == null) {
+            return "/images/machines/excavator.jpg";
+        }
+        return switch (type) {
+            case BACKHOE_LOADER -> "/images/machines/backhoe-loader.jpg";
+            case EXCAVATOR -> "/images/machines/excavator.jpg";
+            case WHEEL_LOADER -> "/images/machines/wheel-loader.jpg";
+            case SKID_STEER -> "/images/machines/skid-steer.jpg";
+            case TELEHANDLER -> "/images/machines/telehandler.jpg";
+            case COMPACTOR -> "/images/machines/compactor.jpg";
+            case BULLDOZER -> "/images/machines/bulldozer.jpg";
+            // Interim photos for the two newest categories - replace with
+            // motor-grader.jpg / dump-truck.jpg once real shots are available.
+            case MOTOR_GRADER -> "/images/machines/bulldozer.jpg";
+            case DUMP_TRUCK -> "/images/machines/wheel-loader.jpg";
+        };
+    }
+
+    /** The standard photo for this machine's type (see {@link #defaultImageFor}). */
+    public String getFallbackImageUrl() {
+        return defaultImageFor(type);
+    }
+
     public MachineStatus getStatus() {
         return status;
     }

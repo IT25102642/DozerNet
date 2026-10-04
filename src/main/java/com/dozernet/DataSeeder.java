@@ -17,8 +17,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
-import java.util.EnumMap;
-import java.util.Map;
 
 /**
  * Seeds demo accounts (with correctly BCrypt-hashed passwords) so the app is
@@ -33,22 +31,6 @@ public class DataSeeder implements CommandLineRunner {
 
     private static final Logger log = LoggerFactory.getLogger(DataSeeder.class);
     public static final String DEMO_PASSWORD = "Password123";
-
-    private static final Map<MachineType, String> TYPE_IMAGES = new EnumMap<>(MachineType.class);
-
-    static {
-        TYPE_IMAGES.put(MachineType.BACKHOE_LOADER, "/images/machines/backhoe-loader.jpg");
-        TYPE_IMAGES.put(MachineType.EXCAVATOR, "/images/machines/excavator.jpg");
-        TYPE_IMAGES.put(MachineType.WHEEL_LOADER, "/images/machines/wheel-loader.jpg");
-        TYPE_IMAGES.put(MachineType.SKID_STEER, "/images/machines/skid-steer.jpg");
-        TYPE_IMAGES.put(MachineType.TELEHANDLER, "/images/machines/telehandler.jpg");
-        TYPE_IMAGES.put(MachineType.COMPACTOR, "/images/machines/compactor.jpg");
-        TYPE_IMAGES.put(MachineType.BULLDOZER, "/images/machines/bulldozer.jpg");
-        // Interim photos for the two newest categories - replace with
-        // motor-grader.jpg / dump-truck.jpg once real shots are available.
-        TYPE_IMAGES.put(MachineType.MOTOR_GRADER, "/images/machines/bulldozer.jpg");
-        TYPE_IMAGES.put(MachineType.DUMP_TRUCK, "/images/machines/wheel-loader.jpg");
-    }
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -127,7 +109,7 @@ public class DataSeeder implements CommandLineRunner {
     }
 
     private static String imageFor(MachineType type) {
-        return TYPE_IMAGES.getOrDefault(type, "/images/machines/excavator.jpg");
+        return Machine.defaultImageFor(type);
     }
 
     private User seed(String name, String email, String phone, String nic, Role role, boolean verified) {

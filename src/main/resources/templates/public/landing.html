@@ -39,7 +39,7 @@
                             <a class="hero-card" th:href="@{'/machines/view/' + ${m.id}}"
                                th:attr="tabindex=${pass == 1} ? '-1' : null">
                                 <span class="hero-card-media">
-                                    <img th:src="@{${m.imageUrl}}" th:alt="${m.model}" width="1200" height="800" decoding="async"/>
+                                    <img th:src="@{${m.imageUrl}}" th:attr="data-fallback=@{${m.fallbackImageUrl}}" th:alt="${m.model}" width="1200" height="800" decoding="async"/>
                                     <span class="hero-card-status">Available</span>
                                 </span>
                                 <span class="hero-card-body">
@@ -65,7 +65,7 @@
                             <a class="hero-card" th:href="@{'/machines/view/' + ${m.id}}"
                                th:attr="tabindex=${pass == 1} ? '-1' : null">
                                 <span class="hero-card-media">
-                                    <img th:src="@{${m.imageUrl}}" th:alt="${m.model}" width="1200" height="800" decoding="async"/>
+                                    <img th:src="@{${m.imageUrl}}" th:attr="data-fallback=@{${m.fallbackImageUrl}}" th:alt="${m.model}" width="1200" height="800" decoding="async"/>
                                     <span class="hero-card-status">Available</span>
                                 </span>
                                 <span class="hero-card-body">
