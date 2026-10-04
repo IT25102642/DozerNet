@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/common :: head('Invoice detail')}"></head>
+<body>
+<nav th:replace="~{fragments/common :: navbar}"></nav>
+<div th:replace="~{fragments/common :: flash}"></div>
+
+<section class="section">
+    <div class="container">
+        <div class="page-head">
+            <div>
+                <p class="eyebrow">Admin &middot; Invoice <span th:text="${invoice.reference}">INV-2026-00001</span></p>
+                <h1 th:text="${invoice.booking.machine.model}">Machine</h1>
+            </div>
+            <a class="btn btn-ghost" th:href="@{/admin/invoices}">Back</a>
+        </div>
+
+        <div class="grid grid-2" style="margin-bottom:var(--space-5)">
+            <div class="card">
+                <p class="muted" style="margin:0">Customer</p>
+                <h3 th:text="${invoice.customer.fullName}">Customer</h3>
+                <p class="muted" th:text="${invoice.customer.email}">email</p>
+                <p>Issued <span th:text="${invoice.issuedDate}">date</span></p>
+                <p>Dates <span th:text="${invoice.booking.startDate}">s</span>
+                    &rarr; <span th:text="${invoice.booking.endDate}">e</span>
+                    (<span class="muted">(<span th:text="${invoice.booking.days}">1</span> days)</span></p>
+            </div>
+            <div class="card">
+                <p class="muted" style="margin:0">Balance</p>
+                <div class="stat"><span th:text="${currencySymbol}">Rs.</span>
+                    <span th:text="${#numbers.formatDecimal(invoice.balance,1,'COMMA',2,'POINT')}">0</span></div>
+                <table class="data" style="margin-top:.6rem">
+                    <tbody>
+                    <tr>
+                        <td>Hire charge</td>
+                        <td style="text-align:right"><span th:text="${currencySymbol}">Rs.</span>
+                            <span th:text="${#numbers.formatDecimal(invoice.baseAmount,1,'COMMA',2,'POINT')}">0</span></td>
+                    </tr>
+                    <tr>
+                        <td>Transport surcharge</td>
+                        <td style="text-align:right"><span th:text="${currencySymbol}">Rs.</span>
+                            <span th:text="${#numbers.formatDecimal(invoice.transportSurcharge,1,'COMMA',2,'POINT')}">0</span></td>
+                    </tr>
+                    <tr>
+                        <td>VAT (18%)</td>
+                        <td style="text-align:right"><span th:text="${currencySymbol}">Rs.</span>
+                            <span th:text="${#numbers.formatDecimal(invoice.vatAmount,1,'COMMA',2,'POINT')}">0</span></td>
+                    </tr>
+                    <tr>
+                        <th>Total</th>
+                        <th style="text-align:right"><span th:text="${currencySymbol}">Rs.</span>
+                            <span th:text="${#numbers.formatDecimal(invoice.amount,1,'COMMA',2,'POINT')}">0</span></th>
+                    </tr>
+                    <tr>
+                        <td>Paid to date</td>
+                        <td style="text-align:right"><span th:text="${currencySymbol}">Rs.</span>
+                            <span th:text="${#numbers.formatDecimal(invoice.amountPaid,1,'COMMA',2,'POINT')}">0</span></td>
+                    </tr>
+                    <tr th:if="${invoice.ownerCommission.signum() > 0}">
+                        <td class="muted">DozerNet commission (10% of hire)</td>
+                        <td class="muted" style="text-align:right"><span th:text="${currencySymbol}">Rs.</span>
+                            <span th:text="${#numbers.formatDecimal(invoice.ownerCommission,1,'COMMA',2,'POINT')}">0</span></td>
+                    </tr>
+                    <tr th:if="${invoice.ownerCommission.signum() > 0}">
+                        <td class="muted">Owner payout</td>
+                        <td class="muted" style="text-align:right"><span th:text="${currencySymbol}">Rs.</span>
+                            <span th:text="${#numbers.formatDecimal(invoice.ownerPayout,1,'COMMA',2,'POINT')}">0</span></td>
+                    </tr>
+                    </tbody>
+                </table>
+                <p><span class="pill" th:text="${invoice.status}">UNPAID</span></p>
+            </div>
+        </div>
+
+        <div class="card" style="margin-bottom:var(--space-5)"
+             th:if="${invoice.status.name() != 'PAID'}">
+            <h3>Record payment</h3>
+            <form th:action="@{'/admin/invoices/' + ${invoice.id} + '/pay'}" method="post" class="form-grid">
+                <label>Amount (LKR)
+                    <input class="input" type="number" step="0.01" min="0.01" name="amount"
+                           th:value="${invoice.balance}" required/>
+                </label>
+                <label>Method
+                    <select class="select" name="method" required>
+                        <option th:each="m : ${methods}" th:value="${m}" th:text="${m}"></option>
+                    </select>
+                </label>
+                <label>Reference (optional)
+                    <input class="input" type="text" name="reference" maxlength="120"
+                           placeholder="Bank slip / receipt no."/>
+                </label>
+                <button class="btn btn-primary" type="submit">Record payment</button>
+            </form>
+        </div>
+
+        <h3>Payment history</h3>
+        <p class="muted" th:if="${#lists.isEmpty(payments)}">No payments recorded yet.</p>
+        <div class="table-wrap" th:unless="${#lists.isEmpty(payments)}">
+            <table class="data">
+                <thead>
+                <tr><th>Date</th><th>Amount</th><th>Method</th><th>Reference</th></tr>
+                </thead>
+                <tbody>
+                <tr th:each="p : ${payments}">
+                    <td th:text="${p.paidDate}">date</td>
+                    <td><span th:text="${currencySymbol}">Rs.</span>
+                        <span th:text="${#numbers.formatDecimal(p.amount,1,'COMMA',2,'POINT')}">0</span></td>
+                    <td th:text="${p.method}">CASH</td>
+                    <td th:text="${p.reference != null ? p.reference : '—'}">—</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+<footer th:replace="~{fragments/common :: footer}"></footer>
+</body>
+</html>

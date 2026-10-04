@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/common :: head('My invoices')}"></head>
+<body>
+<nav th:replace="~{fragments/common :: navbar}"></nav>
+<div th:replace="~{fragments/common :: flash}"></div>
+
+<section class="section">
+    <div class="container">
+        <div class="page-head">
+            <div>
+                <p class="eyebrow">Customer</p>
+                <h1>My invoices</h1>
+            </div>
+            <a class="btn btn-ghost" th:href="@{/customer/dashboard}">Dashboard</a>
+        </div>
+
+        <p class="muted" th:if="${#lists.isEmpty(invoices)}">You have no invoices yet.</p>
+
+        <div class="table-wrap" th:unless="${#lists.isEmpty(invoices)}">
+            <table class="data">
+                <thead>
+                <tr><th>#</th><th>Machine</th><th>Issued</th><th>Amount</th><th>Balance</th><th>Status</th><th></th></tr>
+                </thead>
+                <tbody>
+                <tr th:each="inv : ${invoices}">
+                    <td th:text="${inv.reference}">INV-2026-00001</td>
+                    <td th:text="${inv.booking.machine.model}">Machine</td>
+                    <td th:text="${inv.issuedDate}">date</td>
+                    <td><span th:text="${currencySymbol}">Rs.</span>
+                        <span th:text="${#numbers.formatDecimal(inv.amount,1,'COMMA',2,'POINT')}">0</span></td>
+                    <td><span th:text="${currencySymbol}">Rs.</span>
+                        <span th:text="${#numbers.formatDecimal(inv.balance,1,'COMMA',2,'POINT')}">0</span></td>
+                    <td><span class="pill" th:classappend="${'pill-' + inv.status.name().toLowerCase()}"
+                              th:text="${inv.status.displayName}">UNPAID</span></td>
+                    <td style="display:flex;gap:.35rem;flex-wrap:wrap">
+                        <a class="btn btn-primary btn-sm"
+                           th:if="${inv.status.name() == 'UNPAID' or inv.status.name() == 'PARTIALLY_PAID'}"
+                           th:href="@{'/customer/invoices/' + ${inv.id} + '/pay'}">Pay now</a>
+                        <a class="btn btn-ghost btn-sm" th:href="@{'/customer/invoices/' + ${inv.id}}">View</a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+<footer th:replace="~{fragments/common :: footer}"></footer>
+</body>
+</html>

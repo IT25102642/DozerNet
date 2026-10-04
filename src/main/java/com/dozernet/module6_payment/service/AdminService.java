@@ -89,11 +89,16 @@ public class AdminService {
 
     public RevenueReport revenueReport() {
         List<Invoice> invoices = paymentService.allInvoices();
-        BigDecimal totalInvoiced = invoices.stream().map(Invoice::getAmount)
+        // Cancelled invoices are void: they are neither invoiced nor owed (same rule as the dashboard).
+        List<Invoice> live = invoices.stream()
+                .filter(i -> i.getStatus() != InvoiceStatus.CANCELLED)
+                .toList();
+        BigDecimal totalInvoiced = live.stream().map(Invoice::getAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
         BigDecimal collected = invoices.stream().map(Invoice::getAmountPaid)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
-        BigDecimal outstanding = totalInvoiced.subtract(collected);
+        BigDecimal outstanding = live.stream().map(Invoice::getBalance)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         Map<BookingStatus, Long> bookingCounts = new LinkedHashMap<>();
         for (BookingStatus s : BookingStatus.values()) {

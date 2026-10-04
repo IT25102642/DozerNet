@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/common :: head('Users')}"></head>
+<body>
+<nav th:replace="~{fragments/common :: navbar}"></nav>
+<div th:replace="~{fragments/common :: flash}"></div>
+
+<section class="section">
+    <div class="container">
+        <div class="page-head">
+            <div>
+                <p class="eyebrow">Admin &middot; Accounts</p>
+                <h1>User management</h1>
+            </div>
+            <div style="display:flex;gap:.6rem;flex-wrap:wrap">
+                <a class="btn btn-ghost" th:href="@{/admin/dashboard}">Dashboard</a>
+                <a class="btn btn-primary" th:href="@{/admin/users/new}">Add staff admin</a>
+            </div>
+        </div>
+
+        <div class="table-wrap">
+            <table class="data">
+                <thead>
+                <tr><th>Name</th><th>Email</th><th>Phone</th><th>NIC</th><th>Role</th><th>Status</th><th></th></tr>
+                </thead>
+                <tbody>
+                <tr th:each="u : ${users}">
+                    <td th:text="${u.fullName}">Name</td>
+                    <td th:text="${u.email}">email</td>
+                    <td th:text="${u.phone}">phone</td>
+                    <td th:text="${u.identityCardNumber}">NIC</td>
+                    <td><span class="pill" th:text="${u.rolesLabel}">Customer</span></td>
+                    <td>
+                        <span class="pill pill-approved" th:if="${u.enabled}">Active</span>
+                        <span class="pill pill-rejected" th:unless="${u.enabled}">Disabled</span>
+                    </td>
+                    <td>
+                        <span class="muted" th:if="${currentUser != null and currentUser.id == u.id}">You</span>
+                        <form th:unless="${currentUser != null and currentUser.id == u.id}"
+                              th:action="@{'/admin/users/' + ${u.id} + '/toggle'}" method="post">
+                            <button class="btn btn-sm"
+                                    th:classappend="${u.enabled} ? 'btn-danger' : 'btn-primary'"
+                                    type="submit"
+                                    th:text="${u.enabled} ? 'Disable' : 'Enable'">Disable</button>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+<footer th:replace="~{fragments/common :: footer}"></footer>
+</body>
+</html>

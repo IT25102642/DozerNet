@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/common :: head('Reports')}"></head>
+<body>
+<nav th:replace="~{fragments/common :: navbar}"></nav>
+<div th:replace="~{fragments/common :: flash}"></div>
+
+<section class="section">
+    <div class="container">
+        <div class="page-head">
+            <div>
+                <p class="eyebrow">Admin &middot; Reports</p>
+                <h1>Bookings &amp; revenue</h1>
+            </div>
+            <a class="btn btn-ghost" th:href="@{/admin/dashboard}">Dashboard</a>
+        </div>
+
+        <div class="grid grid-3" style="margin-bottom:var(--space-5)">
+            <div class="card">
+                <p class="muted" style="margin:0">Total invoiced</p>
+                <div class="stat"><span th:text="${currencySymbol}">Rs.</span>
+                    <span th:text="${#numbers.formatDecimal(report.totalInvoiced,1,'COMMA',2,'POINT')}">0</span></div>
+            </div>
+            <div class="card">
+                <p class="muted" style="margin:0">Collected</p>
+                <div class="stat"><span th:text="${currencySymbol}">Rs.</span>
+                    <span th:text="${#numbers.formatDecimal(report.totalCollected,1,'COMMA',2,'POINT')}">0</span></div>
+            </div>
+            <div class="card">
+                <p class="muted" style="margin:0">Outstanding</p>
+                <div class="stat"><span th:text="${currencySymbol}">Rs.</span>
+                    <span th:text="${#numbers.formatDecimal(report.outstanding,1,'COMMA',2,'POINT')}">0</span></div>
+            </div>
+        </div>
+
+        <div class="grid grid-2">
+            <div class="card">
+                <h3>Bookings by status</h3>
+                <div class="table-wrap">
+                    <table class="data">
+                        <thead><tr><th>Status</th><th>Count</th></tr></thead>
+                        <tbody>
+                        <tr th:each="entry : ${report.bookingCounts}">
+                            <td th:text="${entry.key.displayName}">Status</td>
+                            <td th:text="${entry.value}">0</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="card">
+                <h3>Invoices by status</h3>
+                <div class="table-wrap">
+                    <table class="data">
+                        <thead><tr><th>Status</th><th>Count</th></tr></thead>
+                        <tbody>
+                        <tr th:each="entry : ${report.invoiceCounts}">
+                            <td th:text="${entry.key}">Status</td>
+                            <td th:text="${entry.value}">0</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Detailed reports, each downloadable as CSV or PDF -->
+        <div th:each="table : ${tables}" class="card" style="margin-top:var(--space-5)">
+            <div class="page-head" style="margin-bottom:var(--space-3)">
+                <div>
+                    <h3 style="margin:0" th:text="${table.title}">Report</h3>
+                    <p class="muted" style="margin:.2rem 0 0" th:text="${table.subtitle}">What it covers</p>
+                </div>
+                <div style="display:flex;gap:.4rem">
+                    <a class="btn btn-ghost btn-sm" th:href="@{'/admin/reports/' + ${table.key} + '.csv'}">CSV</a>
+                    <a class="btn btn-ghost btn-sm" th:href="@{'/admin/reports/' + ${table.key} + '.pdf'}">PDF</a>
+                </div>
+            </div>
+
+            <p class="muted" th:if="${table.empty}">No data for this report yet.</p>
+
+            <div class="table-wrap" th:unless="${table.empty}">
+                <table class="data">
+                    <thead>
+                    <tr><th th:each="col : ${table.columns}" th:text="${col}">Column</th></tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="row : ${table.rows}">
+                        <td th:each="cell : ${row}" th:text="${cell}">value</td>
+                    </tr>
+                    </tbody>
+                    <tfoot th:if="${table.hasTotals()}">
+                    <tr>
+                        <th th:each="cell : ${table.totals}" th:text="${cell}">total</th>
+                    </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>
+
+<footer th:replace="~{fragments/common :: footer}"></footer>
+</body>
+</html>

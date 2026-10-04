@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/common :: head('Thank you')}"></head>
+<body>
+<nav th:replace="~{fragments/common :: navbar}"></nav>
+<div th:replace="~{fragments/common :: flash}"></div>
+
+<section class="section">
+    <div class="container form-panel">
+        <div class="card thank-you-card">
+            <p class="eyebrow">Payment successful</p>
+            <h1>Thank you, <span th:text="${invoice.customer.fullName}">Customer</span></h1>
+            <p>
+                Your payment for
+                <strong th:text="${invoice.booking.machine.model}">Machine</strong>
+                has been received.
+            </p>
+            <p class="muted"
+               th:if="${invoice.booking.jobSiteLabel != null and !#strings.isEmpty(invoice.booking.jobSiteLabel)}">
+                Job site:
+                <span th:text="${invoice.booking.jobSiteLabel}">Site</span>
+            </p>
+            <p>
+                Amount paid:
+                <strong>
+                    <span th:text="${currencySymbol}">Rs.</span>
+                    <span th:text="${#numbers.formatDecimal(invoice.amountPaid,1,'COMMA',2,'POINT')}">0</span>
+                </strong>
+                &middot; Invoice <span th:text="${invoice.reference}">INV-2026-00001</span>
+            </p>
+            <p class="muted">
+                A confirmation and invoice copy were sent to
+                <strong th:text="${invoice.customer.email}">email</strong>.
+            </p>
+            <p th:if="${invoice.status.name() == 'PAID'}">
+                <span class="pill pill-completed">Paid in full</span>
+                An operator will be assigned to your job next.
+            </p>
+            <div style="display:flex;gap:.75rem;flex-wrap:wrap;margin-top:var(--space-3)">
+                <a class="btn btn-primary" th:href="@{/customer/bookings}">My bookings</a>
+                <a class="btn btn-ghost" th:href="@{/customer/dashboard}">Dashboard</a>
+                <a class="btn btn-ghost" th:href="@{'/customer/invoices/' + ${invoice.id}}">View invoice</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<footer th:replace="~{fragments/common :: footer}"></footer>
+</body>
+</html>

@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/common :: head('Invoices')}"></head>
+<body>
+<nav th:replace="~{fragments/common :: navbar}"></nav>
+<div th:replace="~{fragments/common :: flash}"></div>
+
+<section class="section">
+    <div class="container">
+        <div class="page-head">
+            <div>
+                <p class="eyebrow">Admin &middot; Payment</p>
+                <h1>Invoices</h1>
+            </div>
+            <div style="display:flex;gap:.5rem;flex-wrap:wrap">
+                <form th:action="@{/admin/invoices/remind}" method="post">
+                    <button class="btn btn-ghost" type="submit"
+                            title="Notify every customer who still owes money">Send balance reminders</button>
+                </form>
+                <form th:action="@{/admin/invoices/generate-all}" method="post"
+                      th:if="${pendingInvoices != null and !#lists.isEmpty(pendingInvoices)}">
+                    <button class="btn btn-primary" type="submit">Generate all pending</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="card" style="margin-bottom:var(--space-5)"
+             th:if="${pendingInvoices != null and !#lists.isEmpty(pendingInvoices)}">
+            <h3>Bookings awaiting invoice (recovery)</h3>
+            <p class="muted">Invoices are normally created when a booking is approved. Use this only if one is missing.</p>
+            <div class="table-wrap">
+                <table class="data">
+                    <thead>
+                    <tr><th>Customer</th><th>Machine</th><th>Dates</th><th>Total</th><th></th></tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="b : ${pendingInvoices}">
+                        <td th:text="${b.customer.fullName}">Customer</td>
+                        <td th:text="${b.machine.model}">Machine</td>
+                        <td><span th:text="${b.startDate}">start</span> &rarr; <span th:text="${b.endDate}">end</span></td>
+                        <td><span th:text="${currencySymbol}">Rs.</span>
+                            <span th:text="${#numbers.formatDecimal(b.totalAmount,1,'COMMA',2,'POINT')}">0</span></td>
+                        <td>
+                            <form th:action="@{'/admin/invoices/generate/' + ${b.id}}" method="post">
+                                <button class="btn btn-primary btn-sm" type="submit">Generate</button>
+                            </form>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <p class="muted" th:if="${#lists.isEmpty(invoices)}">No invoices yet.</p>
+
+        <div class="table-wrap" th:unless="${#lists.isEmpty(invoices)}">
+            <table class="data">
+                <thead>
+                <tr><th>#</th><th>Customer</th><th>Machine</th><th>Issued</th><th>Amount</th><th>Paid</th><th>Balance</th><th>Status</th><th></th></tr>
+                </thead>
+                <tbody>
+                <tr th:each="inv : ${invoices}">
+                    <td th:text="${inv.reference}">INV-2026-00001</td>
+                    <td th:text="${inv.customer.fullName}">Customer</td>
+                    <td th:text="${inv.booking.machine.model}">Machine</td>
+                    <td th:text="${inv.issuedDate}">2026-01-01</td>
+                    <td><span th:text="${currencySymbol}">Rs.</span>
+                        <span th:text="${#numbers.formatDecimal(inv.amount,1,'COMMA',2,'POINT')}">0</span></td>
+                    <td><span th:text="${currencySymbol}">Rs.</span>
+                        <span th:text="${#numbers.formatDecimal(inv.amountPaid,1,'COMMA',2,'POINT')}">0</span></td>
+                    <td><span th:text="${currencySymbol}">Rs.</span>
+                        <span th:text="${#numbers.formatDecimal(inv.balance,1,'COMMA',2,'POINT')}">0</span></td>
+                    <td><span class="pill" th:text="${inv.status}">UNPAID</span></td>
+                    <td><a class="btn btn-ghost btn-sm" th:href="@{'/admin/invoices/' + ${inv.id}}">Open</a></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+<footer th:replace="~{fragments/common :: footer}"></footer>
+</body>
+</html>

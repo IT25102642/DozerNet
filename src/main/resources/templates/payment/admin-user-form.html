@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/common :: head('Add staff admin')}"></head>
+<body>
+<nav th:replace="~{fragments/common :: navbar}"></nav>
+
+<section class="section">
+    <div class="container form-panel">
+        <a class="muted" th:href="@{/admin/users}">&larr; Back to users</a>
+        <p class="eyebrow" style="margin-top:var(--space-3)">Admin &middot; Accounts</p>
+        <h1>Add staff admin</h1>
+        <p class="lead" style="font-size:1.05rem">
+            Creates an administrator account with full access to this dashboard. Share the password
+            with the person securely; they can sign in straight away.
+        </p>
+
+        <div class="card">
+            <form th:action="@{/admin/users/new}" th:object="${staffForm}" method="post" novalidate>
+                <div class="alert alert-danger" th:if="${#fields.hasGlobalErrors()}">
+                    <div th:each="err : ${#fields.globalErrors()}" th:text="${err}">error</div>
+                </div>
+                <div class="field">
+                    <label for="fullName">Full name</label>
+                    <input class="input" id="fullName" type="text" th:field="*{fullName}" placeholder="Nimali Silva"/>
+                    <div class="field-error" th:if="${#fields.hasErrors('fullName')}" th:errors="*{fullName}"></div>
+                </div>
+                <div class="field">
+                    <label for="email">Email</label>
+                    <input class="input" id="email" type="email" th:field="*{email}" placeholder="staff@dozernet.lk"/>
+                    <div class="field-error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
+                </div>
+                <div class="form-row">
+                    <div class="field">
+                        <label for="phone">Phone</label>
+                        <input class="input" id="phone" type="text" th:field="*{phone}" placeholder="0771234567"/>
+                        <div class="field-error" th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}"></div>
+                    </div>
+                    <div class="field">
+                        <label for="identityCardNumber">Identity card number (NIC)</label>
+                        <input class="input" id="identityCardNumber" type="text" th:field="*{identityCardNumber}"
+                               placeholder="199512345678 or 123456789V"/>
+                        <div class="field-error" th:if="${#fields.hasErrors('identityCardNumber')}" th:errors="*{identityCardNumber}"></div>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="field">
+                        <label for="password">Password</label>
+                        <input class="input" id="password" type="password" th:field="*{password}"
+                               autocomplete="new-password" placeholder="8+ chars, 1 capital, 1 number"/>
+                        <div class="field-error" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></div>
+                    </div>
+                    <div class="field">
+                        <label for="confirmPassword">Confirm password</label>
+                        <input class="input" id="confirmPassword" type="password" th:field="*{confirmPassword}"
+                               autocomplete="new-password" placeholder="Re-enter password"/>
+                        <div class="field-error" th:if="${#fields.hasErrors('confirmPassword')}" th:errors="*{confirmPassword}"></div>
+                    </div>
+                </div>
+                <button class="btn btn-primary" type="submit">Create administrator</button>
+                <a class="btn btn-ghost" th:href="@{/admin/users}">Cancel</a>
+            </form>
+        </div>
+    </div>
+</section>
+
+<footer th:replace="~{fragments/common :: footer}"></footer>
+</body>
+</html>

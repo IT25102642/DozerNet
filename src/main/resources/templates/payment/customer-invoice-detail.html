@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/common :: head('Invoice')}"></head>
+<body>
+<nav th:replace="~{fragments/common :: navbar}"></nav>
+<div th:replace="~{fragments/common :: flash}"></div>
+
+<section class="section">
+    <div class="container">
+        <div class="page-head">
+            <div>
+                <p class="eyebrow">Invoice <span th:text="${invoice.reference}">INV-2026-00001</span></p>
+                <h1 th:text="${invoice.booking.machine.model}">Machine</h1>
+            </div>
+            <div style="display:flex;gap:.5rem;flex-wrap:wrap">
+                <a class="btn btn-primary"
+                   th:if="${invoice.status.name() == 'UNPAID' or invoice.status.name() == 'PARTIALLY_PAID'}"
+                   th:href="@{'/customer/invoices/' + ${invoice.id} + '/pay'}">Pay now</a>
+                <a class="btn btn-ghost" th:href="@{/customer/invoices}">Back</a>
+            </div>
+        </div>
+
+        <p class="muted" style="margin-top:calc(-1 * var(--space-2))">
+            Invoice sent to <strong th:text="${invoice.customer.email}">email</strong>.
+        </p>
+
+        <div class="grid grid-2" style="margin-bottom:var(--space-5)">
+            <div class="card">
+                <p>Rental <span th:text="${invoice.booking.startDate}">s</span>
+                    &rarr; <span th:text="${invoice.booking.endDate}">e</span></p>
+                <p th:if="${invoice.booking.jobSiteLabel != null and !#strings.isEmpty(invoice.booking.jobSiteLabel)}">
+                    Job site: <span th:text="${invoice.booking.jobSiteLabel}">Site</span>
+                </p>
+                <p>Issued <span th:text="${invoice.issuedDate}">date</span></p>
+                <p><span class="pill" th:classappend="${'pill-' + invoice.status.name().toLowerCase()}"
+                         th:text="${invoice.status.displayName}">UNPAID</span></p>
+            </div>
+            <div class="card">
+                <p class="muted" style="margin:0">Amount due</p>
+                <div class="stat"><span th:text="${currencySymbol}">Rs.</span>
+                    <span th:text="${#numbers.formatDecimal(invoice.balance,1,'COMMA',2,'POINT')}">0</span></div>
+                <table class="data" style="margin-top:.6rem">
+                    <tbody>
+                    <tr>
+                        <td>Hire charge</td>
+                        <td style="text-align:right"><span th:text="${currencySymbol}">Rs.</span>
+                            <span th:text="${#numbers.formatDecimal(invoice.baseAmount,1,'COMMA',2,'POINT')}">0</span></td>
+                    </tr>
+                    <tr>
+                        <td>Transport surcharge</td>
+                        <td style="text-align:right"><span th:text="${currencySymbol}">Rs.</span>
+                            <span th:text="${#numbers.formatDecimal(invoice.transportSurcharge,1,'COMMA',2,'POINT')}">0</span></td>
+                    </tr>
+                    <tr>
+                        <td>VAT (18%)</td>
+                        <td style="text-align:right"><span th:text="${currencySymbol}">Rs.</span>
+                            <span th:text="${#numbers.formatDecimal(invoice.vatAmount,1,'COMMA',2,'POINT')}">0</span></td>
+                    </tr>
+                    <tr>
+                        <th>Total</th>
+                        <th style="text-align:right"><span th:text="${currencySymbol}">Rs.</span>
+                            <span th:text="${#numbers.formatDecimal(invoice.amount,1,'COMMA',2,'POINT')}">0</span></th>
+                    </tr>
+                    <tr th:if="${invoice.amountPaid.signum() != 0}">
+                        <td>Paid to date</td>
+                        <td style="text-align:right"><span th:text="${currencySymbol}">Rs.</span>
+                            <span th:text="${#numbers.formatDecimal(invoice.amountPaid,1,'COMMA',2,'POINT')}">0</span></td>
+                    </tr>
+                    </tbody>
+                </table>
+                <p class="muted" th:if="${invoice.status.name() != 'PAID'}">
+                    Pay online with the demo card portal, or an admin can record cash / bank transfer.
+                </p>
+            </div>
+        </div>
+
+        <h3>Payment history</h3>
+        <p class="muted" th:if="${#lists.isEmpty(payments)}">No payments recorded yet.</p>
+        <div class="table-wrap" th:unless="${#lists.isEmpty(payments)}">
+            <table class="data">
+                <thead>
+                <tr><th>Date</th><th>Amount</th><th>Method</th><th>Reference</th></tr>
+                </thead>
+                <tbody>
+                <tr th:each="p : ${payments}">
+                    <td th:text="${p.paidDate}">date</td>
+                    <td><span th:text="${currencySymbol}">Rs.</span>
+                        <span th:text="${#numbers.formatDecimal(p.amount,1,'COMMA',2,'POINT')}">0</span></td>
+                    <td th:text="${p.method.displayName}">CASH</td>
+                    <td th:text="${p.reference != null ? p.reference : '—'}">—</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+<footer th:replace="~{fragments/common :: footer}"></footer>
+</body>
+</html>

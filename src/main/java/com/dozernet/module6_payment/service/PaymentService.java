@@ -455,8 +455,4 @@ public class PaymentService {
         return pending;
     }
 
-    /** @deprecated Prefer {@link #bookingsWithoutInvoice()}; kept for older callers. */
-    public List<Booking> completedBookingsWithoutInvoice() {
-        return bookingsWithoutInvoice();
-    }
 }

@@ -8,7 +8,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -48,27 +47,12 @@ public interface InvoiceRepository extends JpaRepository<Invoice, Long> {
 
     long countByStatus(InvoiceStatus status);
 
-    long countByCustomerAndStatusNot(User customer, InvoiceStatus status);
-
-    List<Invoice> findByStatusOrderByIssuedDateAsc(InvoiceStatus status);
-
     /** Highest sequence number issued in a given year, for INV-YYYY-NNNNN numbering. */
     @Query("""
             select count(i) from Invoice i
             where i.invoiceNumber like concat('INV-', :year, '-%')
             """)
     long countIssuedInYear(@Param("year") String year);
-
-    /** Invoices in a date window - the basis of the monthly revenue report. */
-    @Query("""
-            select i from Invoice i
-            join fetch i.customer
-            join fetch i.booking b
-            join fetch b.machine
-            where i.issuedDate between :from and :to
-            order by i.issuedDate asc
-            """)
-    List<Invoice> findIssuedBetween(@Param("from") LocalDate from, @Param("to") LocalDate to);
 
     /** Everything still owing, oldest first - the outstanding payments report. */
     @Query("""

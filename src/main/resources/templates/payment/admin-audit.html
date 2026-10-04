@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/common :: head('Audit log')}"></head>
+<body>
+<nav th:replace="~{fragments/common :: navbar}"></nav>
+<div th:replace="~{fragments/common :: flash}"></div>
+
+<section class="section">
+    <div class="container">
+        <div class="page-head">
+            <div>
+                <p class="eyebrow">Admin &middot; Accountability</p>
+                <h1>Audit log</h1>
+            </div>
+            <a class="btn btn-ghost" th:href="@{/admin/dashboard}">Back to dashboard</a>
+        </div>
+
+        <p class="muted">
+            Every approval, verification, payment and status change is recorded here and never edited,
+            so it stays clear who changed what and when.
+            <span th:text="'Total entries: ' + ${totalEntries}">Total entries: 0</span>
+        </p>
+
+        <p class="muted" th:if="${#lists.isEmpty(entries)}">Nothing recorded yet.</p>
+
+        <div class="table-wrap" th:unless="${#lists.isEmpty(entries)}">
+            <table class="data">
+                <thead>
+                <tr><th>When</th><th>Who</th><th>Action</th><th>Record</th><th>Details</th></tr>
+                </thead>
+                <tbody>
+                <tr th:each="e : ${entries}">
+                    <td th:text="${#temporals.format(e.createdAt, 'dd MMM yyyy HH:mm')}">date</td>
+                    <td th:text="${e.actorLabel}">Who</td>
+                    <td><span class="pill" th:text="${e.action}">ACTION</span></td>
+                    <td>
+                        <span th:text="${e.entityType}">Type</span>
+                        <span class="muted" th:if="${e.entityId != null}" th:text="'#' + ${e.entityId}">#1</span>
+                    </td>
+                    <td th:text="${e.details}">details</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="toolbar" th:if="${totalPages > 1}" style="margin-top:1rem">
+            <a class="btn btn-ghost btn-sm" th:if="${currentPage > 0}"
+               th:href="@{/admin/audit(page=${currentPage - 1})}">&larr; Newer</a>
+            <span class="muted" th:text="'Page ' + (${currentPage} + 1) + ' of ' + ${totalPages}">Page 1</span>
+            <a class="btn btn-ghost btn-sm" th:if="${currentPage + 1 < totalPages}"
+               th:href="@{/admin/audit(page=${currentPage + 1})}">Older &rarr;</a>
+        </div>
+    </div>
+</section>
+
+<footer th:replace="~{fragments/common :: footer}"></footer>
+</body>
+</html>

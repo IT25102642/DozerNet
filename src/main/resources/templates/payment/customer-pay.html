@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/common :: head('Pay invoice')}"></head>
+<body>
+<nav th:replace="~{fragments/common :: navbar}"></nav>
+<div th:replace="~{fragments/common :: flash}"></div>
+
+<section class="section">
+    <div class="container form-panel">
+        <a class="muted" th:href="@{'/customer/invoices/' + ${invoice.id}}">&larr; Back to invoice</a>
+        <p class="eyebrow" style="margin-top:var(--space-2)">Secure checkout (demo)</p>
+        <h1>Pay invoice <span th:text="${invoice.reference}">INV-2026-00001</span></h1>
+        <p class="muted">
+            A copy of this invoice was sent to
+            <strong th:text="${invoice.customer.email}">email</strong>.
+        </p>
+
+        <div class="card" style="margin-bottom:var(--space-3)">
+            <p style="margin:0">
+                <strong th:text="${invoice.booking.machine.model}">Machine</strong>
+                &middot;
+                <span th:text="${invoice.booking.startDate}">s</span>
+                &rarr;
+                <span th:text="${invoice.booking.endDate}">e</span>
+            </p>
+            <p class="muted" style="margin:.35rem 0 0"
+               th:if="${invoice.booking.jobSiteLabel != null and !#strings.isEmpty(invoice.booking.jobSiteLabel)}"
+               th:text="${invoice.booking.jobSiteLabel}">Site</p>
+            <table class="data" style="margin-top:var(--space-2)">
+                <tbody>
+                <tr>
+                    <td>Hire charge</td>
+                    <td style="text-align:right"><span th:text="${currencySymbol}">Rs.</span>
+                        <span th:text="${#numbers.formatDecimal(invoice.baseAmount,1,'COMMA',2,'POINT')}">0</span></td>
+                </tr>
+                <tr>
+                    <td>Transport to <span th:text="${invoice.booking.jobSiteDistrict}">district</span></td>
+                    <td style="text-align:right"><span th:text="${currencySymbol}">Rs.</span>
+                        <span th:text="${#numbers.formatDecimal(invoice.transportSurcharge,1,'COMMA',2,'POINT')}">0</span></td>
+                </tr>
+                <tr>
+                    <td>VAT (18%)</td>
+                    <td style="text-align:right"><span th:text="${currencySymbol}">Rs.</span>
+                        <span th:text="${#numbers.formatDecimal(invoice.vatAmount,1,'COMMA',2,'POINT')}">0</span></td>
+                </tr>
+                <tr th:if="${invoice.amountPaid.signum() > 0}">
+                    <td>Already paid</td>
+                    <td style="text-align:right">&minus; <span th:text="${currencySymbol}">Rs.</span>
+                        <span th:text="${#numbers.formatDecimal(invoice.amountPaid,1,'COMMA',2,'POINT')}">0</span></td>
+                </tr>
+                </tbody>
+            </table>
+            <div class="stat" style="margin-top:var(--space-2)">
+                <span th:text="${currencySymbol}">Rs.</span>
+                <span th:text="${#numbers.formatDecimal(invoice.balance,1,'COMMA',2,'POINT')}">0</span>
+            </div>
+            <p class="muted" style="margin:0">Balance outstanding</p>
+        </div>
+
+        <form class="card pay-portal" th:action="@{'/customer/invoices/' + ${invoice.id} + '/pay'}" method="post">
+            <p class="muted" style="margin-top:0">Demo payment portal — no real card is charged.</p>
+            <div class="field">
+                <label for="cardholderName">Cardholder name</label>
+                <input class="input" id="cardholderName" name="cardholderName" required
+                       autocomplete="cc-name" placeholder="Name on card"/>
+            </div>
+            <div class="field">
+                <label for="cardNumber">Card number</label>
+                <input class="input" id="cardNumber" name="cardNumber" required
+                       inputmode="numeric" autocomplete="cc-number"
+                       placeholder="4242 4242 4242 4242" maxlength="19"/>
+            </div>
+            <div class="form-row">
+                <div class="field">
+                    <label for="expiry">Expiry</label>
+                    <input class="input" id="expiry" name="expiry" required placeholder="MM/YY"
+                           maxlength="5" autocomplete="cc-exp" pattern="(0[1-9]|1[0-2])/\d{2}"
+                           title="Enter the expiry as MM/YY"/>
+                </div>
+                <div class="field">
+                    <label for="cvc">CVV</label>
+                    <input class="input" id="cvc" name="cvc" required placeholder="123"
+                           maxlength="3" inputmode="numeric" autocomplete="cc-csc"
+                           pattern="\d{3}" title="CVV must be 3 digits"/>
+                </div>
+            </div>
+            <div class="field">
+                <label for="amount">Amount to pay</label>
+                <input class="input" type="number" id="amount" name="amount" step="0.01" min="0.01"
+                       th:max="${invoice.balance}" th:value="${invoice.balance}" required/>
+                <p class="muted" style="margin:.35rem 0 0">
+                    Pay the full balance, or enter a smaller amount to pay in instalments.
+                    An operator is assigned only once the invoice is settled in full.
+                </p>
+            </div>
+            <button class="btn btn-primary" type="submit">Pay now</button>
+        </form>
+    </div>
+</section>
+
+<footer th:replace="~{fragments/common :: footer}"></footer>
+</body>
+</html>
