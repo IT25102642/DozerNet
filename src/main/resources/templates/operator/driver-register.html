@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/common :: head('Driver registration')}"></head>
+<body>
+<nav th:replace="~{fragments/common :: navbar}"></nav>
+
+<div class="auth-wrap">
+    <div class="card auth-card">
+        <p class="eyebrow">Independent driver</p>
+        <h1 style="font-size:1.8rem">Join as an operator</h1>
+        <p class="muted">Register to get assigned to jobs. An admin will verify your licence before you can be assigned.</p>
+
+        <form th:action="@{/register/driver}" th:object="${driverForm}" method="post" enctype="multipart/form-data" novalidate>
+            <div class="alert alert-danger" th:if="${#fields.hasGlobalErrors()}">
+                <div th:each="err : ${#fields.globalErrors()}" th:text="${err}">error</div>
+            </div>
+            <div class="field">
+                <label for="fullName">Full name</label>
+                <input class="input" id="fullName" type="text" th:field="*{fullName}"/>
+                <div class="field-error" th:if="${#fields.hasErrors('fullName')}" th:errors="*{fullName}"></div>
+            </div>
+            <div class="field">
+                <label for="email">Email</label>
+                <input class="input" id="email" type="email" th:field="*{email}"/>
+                <div class="field-error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
+            </div>
+            <div class="form-row">
+                <div class="field">
+                    <label for="phone">Phone</label>
+                    <input class="input" id="phone" type="text" th:field="*{phone}" placeholder="0771234567"/>
+                    <div class="field-error" th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}"></div>
+                </div>
+                <div class="field">
+                    <label for="identityCardNumber">Identity card number (NIC)</label>
+                    <input class="input" id="identityCardNumber" type="text" th:field="*{identityCardNumber}"
+                           placeholder="199512345678 or 123456789V"/>
+                    <div class="field-error" th:if="${#fields.hasErrors('identityCardNumber')}" th:errors="*{identityCardNumber}"></div>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="field">
+                    <label for="licenceNumber">Licence number</label>
+                    <input class="input" id="licenceNumber" type="text" th:field="*{licenceNumber}"/>
+                    <div class="field-error" th:if="${#fields.hasErrors('licenceNumber')}" th:errors="*{licenceNumber}"></div>
+                </div>
+                <div class="field">
+                    <label for="experienceYears">Years of experience</label>
+                    <input class="input" id="experienceYears" type="number" min="0" max="60" th:field="*{experienceYears}"/>
+                    <div class="field-error" th:if="${#fields.hasErrors('experienceYears')}" th:errors="*{experienceYears}"></div>
+                </div>
+            </div>
+            <p class="muted" style="font-size:.8rem;margin:0 0 var(--space-3)">NIC cannot be changed after registration.</p>
+            <div class="form-row">
+                <div class="field">
+                    <label for="password">Password</label>
+                    <input class="input" id="password" type="password" th:field="*{password}"/>
+                    <div class="field-error" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></div>
+                </div>
+                <div class="field">
+                    <label for="confirmPassword">Confirm password</label>
+                    <input class="input" id="confirmPassword" type="password" th:field="*{confirmPassword}"/>
+                    <div class="field-error" th:if="${#fields.hasErrors('confirmPassword')}" th:errors="*{confirmPassword}"></div>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="field">
+                    <label for="licenceCopy">Driving licence copy (optional)</label>
+                    <input class="input" id="licenceCopy" type="file" name="licenceCopy"
+                           accept="image/jpeg,image/png,image/webp,application/pdf"/>
+                </div>
+                <div class="field">
+                    <label for="nicCopy">NIC copy (optional)</label>
+                    <input class="input" id="nicCopy" type="file" name="nicCopy"
+                           accept="image/jpeg,image/png,image/webp,application/pdf"/>
+                </div>
+            </div>
+            <p class="muted" style="margin:0 0 var(--space-2)">
+                An admin verifies your licence against these documents before you can be assigned jobs.
+            </p>
+            <button class="btn btn-primary btn-block" type="submit">Register as driver</button>
+        </form>
+        <p class="muted" style="margin-top:var(--space-3);text-align:center">
+            Already registered? <a th:href="@{/login}">Sign in</a>
+        </p>
+    </div>
+</div>
+
+<footer th:replace="~{fragments/common :: footer}"></footer>
+</body>
+</html>

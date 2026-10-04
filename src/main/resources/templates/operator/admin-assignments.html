@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/common :: head('Assign operators')}"></head>
+<body>
+<nav th:replace="~{fragments/common :: navbar}"></nav>
+<div th:replace="~{fragments/common :: flash}"></div>
+
+<section class="section">
+    <div class="container">
+        <div class="page-head">
+            <div>
+                <p class="eyebrow">Admin &middot; Assignments</p>
+                <h1>Paid bookings ready for an operator</h1>
+            </div>
+            <a class="btn btn-ghost" th:href="@{/admin/operators}">Operators</a>
+        </div>
+
+        <div class="alert alert-success" th:if="${readyToAssign != null and !#lists.isEmpty(readyToAssign)}">
+            <strong>Payment completed — assign an operator.</strong>
+            <span th:text="${#lists.size(readyToAssign)}">1</span>
+            paid booking(s) are ready.
+        </div>
+
+        <p class="muted" th:if="${#lists.isEmpty(bookings)}">No paid bookings are waiting for an operator right now.</p>
+        <div class="alert alert-info" th:if="${!#lists.isEmpty(bookings) and #lists.isEmpty(operators)}">
+            There are no verified operators yet. Add or verify an operator first.
+        </div>
+
+        <div class="table-wrap" th:unless="${#lists.isEmpty(bookings)}">
+            <table class="data">
+                <thead>
+                <tr><th>Customer</th><th>Machine</th><th>Dates</th><th>Payment</th><th>Assign operator</th></tr>
+                </thead>
+                <tbody>
+                <tr th:each="b : ${bookings}">
+                    <td th:text="${b.customer.fullName}">Customer</td>
+                    <td th:text="${b.machine.model}">Machine</td>
+                    <td><span th:text="${b.startDate}">start</span> &rarr; <span th:text="${b.endDate}">end</span></td>
+                    <td>
+                        <span class="pill"
+                              th:classappend="${paymentLabels.get(b.id) == 'Paid'} ? ' pill-completed' : ' pill-pending'"
+                              th:text="${paymentLabels.get(b.id)}">Unpaid</span>
+                    </td>
+                    <td>
+                        <th:block th:if="${paymentLabels.get(b.id) == 'Paid'}">
+                            <form th:action="@{/admin/assignments/assign}" method="post" style="display:flex;gap:.3rem">
+                                <input type="hidden" name="bookingId" th:value="${b.id}"/>
+                                <select class="select" name="operatorId" style="padding:.35rem .5rem" required>
+                                    <option value="" disabled selected>Select operator</option>
+                                    <!-- Free operators are listed first; busy ones are flagged. -->
+                                    <option th:each="opt : ${suggestions.get(b.id)}" th:value="${opt.profile.user.id}"
+                                            th:disabled="${!opt.available}"
+                                            th:text="${opt.profile.user.fullName} + ' (' + ${opt.profile.experienceYears} + ' yr)'
+                                                     + (${opt.available} ? ' — available' : ' — busy ' + ${opt.clashingJobDates})"></option>
+                                </select>
+                                <button class="btn btn-primary btn-sm" type="submit" th:disabled="${#lists.isEmpty(operators)}">Assign</button>
+                            </form>
+                        </th:block>
+                        <span class="muted" th:unless="${paymentLabels.get(b.id) == 'Paid'}">
+                            Waiting for customer payment
+                        </span>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+<footer th:replace="~{fragments/common :: footer}"></footer>
+</body>
+</html>

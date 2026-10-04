@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/common :: head('Operators')}"></head>
+<body>
+<nav th:replace="~{fragments/common :: navbar}"></nav>
+<div th:replace="~{fragments/common :: flash}"></div>
+
+<section class="section">
+    <div class="container">
+        <div class="page-head">
+            <div>
+                <p class="eyebrow">Admin &middot; Operators</p>
+                <h1>Operators</h1>
+            </div>
+            <a class="btn btn-ghost" th:href="@{/admin/assignments}">Assign jobs</a>
+        </div>
+
+        <div class="grid grid-2" style="align-items:start">
+            <!-- Operator list -->
+            <div>
+                <div class="table-wrap">
+                    <table class="data">
+                        <thead>
+                        <tr><th>Name</th><th>Type</th><th>Licence</th><th>Exp.</th><th>Status</th><th></th></tr>
+                        </thead>
+                        <tbody>
+                        <tr th:if="${#lists.isEmpty(operators)}"><td colspan="6" class="muted">No operators yet.</td></tr>
+                        <tr th:each="o : ${operators}">
+                            <td th:text="${o.user.fullName}">Name</td>
+                            <td th:text="${o.independent} ? 'Independent' : 'Company'">Type</td>
+                            <td th:text="${o.licenceNumber}">Licence</td>
+                            <td th:text="${o.experienceYears} + ' yr'">0</td>
+                            <td>
+                                <span class="pill pill-approved" th:if="${o.verified}">Verified</span>
+                                <span class="pill pill-pending" th:unless="${o.verified}">Pending</span>
+                            </td>
+                            <td>
+                                <th:block th:if="${operatorDocuments != null and operatorDocuments.get(o.id) != null}">
+                                    <a th:each="doc : ${operatorDocuments.get(o.id)}"
+                                       class="btn btn-ghost btn-sm" style="margin:0 .2rem .2rem 0"
+                                       th:href="@{'/documents/' + ${doc.id}}" target="_blank"
+                                       th:text="${doc.type.displayName}">Document</a>
+                                </th:block>
+                                <form th:unless="${o.verified}" th:action="@{'/admin/operators/' + ${o.id} + '/verify'}" method="post">
+                                    <button class="btn btn-primary btn-sm" type="submit">Verify</button>
+                                </form>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Add company operator -->
+            <div class="card">
+                <h3>Add company operator</h3>
+                <form th:action="@{/admin/operators/new}" th:object="${operatorForm}" method="post" novalidate>
+                    <div class="field">
+                        <label for="fullName">Full name</label>
+                        <input class="input" id="fullName" type="text" th:field="*{fullName}"/>
+                        <div class="field-error" th:if="${#fields.hasErrors('fullName')}" th:errors="*{fullName}"></div>
+                    </div>
+                    <div class="field">
+                        <label for="email">Email</label>
+                        <input class="input" id="email" type="email" th:field="*{email}"/>
+                        <div class="field-error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
+                    </div>
+                    <div class="form-row">
+                        <div class="field">
+                            <label for="phone">Phone</label>
+                            <input class="input" id="phone" type="text" th:field="*{phone}"/>
+                            <div class="field-error" th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}"></div>
+                        </div>
+                        <div class="field">
+                            <label for="identityCardNumber">NIC</label>
+                            <input class="input" id="identityCardNumber" type="text" th:field="*{identityCardNumber}"
+                                   placeholder="199512345678"/>
+                            <div class="field-error" th:if="${#fields.hasErrors('identityCardNumber')}" th:errors="*{identityCardNumber}"></div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="field">
+                            <label for="licenceNumber">Licence number</label>
+                            <input class="input" id="licenceNumber" type="text" th:field="*{licenceNumber}"/>
+                            <div class="field-error" th:if="${#fields.hasErrors('licenceNumber')}" th:errors="*{licenceNumber}"></div>
+                        </div>
+                        <div class="field">
+                            <label for="experienceYears">Experience (years)</label>
+                            <input class="input" id="experienceYears" type="number" min="0" max="60" th:field="*{experienceYears}"/>
+                            <div class="field-error" th:if="${#fields.hasErrors('experienceYears')}" th:errors="*{experienceYears}"></div>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label for="password">Initial password</label>
+                        <input class="input" id="password" type="password" th:field="*{password}"/>
+                        <div class="field-error" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></div>
+                    </div>
+                    <button class="btn btn-primary" type="submit">Add operator</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+
+<footer th:replace="~{fragments/common :: footer}"></footer>
+</body>
+</html>
