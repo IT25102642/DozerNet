@@ -37,7 +37,7 @@
             <div class="card">
                 <h3>Bookings by status</h3>
                 <div class="table-wrap">
-                    <table class="data">
+                    <table class="data data-wrap">
                         <thead><tr><th>Status</th><th>Count</th></tr></thead>
                         <tbody>
                         <tr th:each="entry : ${report.bookingCounts}">
@@ -51,7 +51,7 @@
             <div class="card">
                 <h3>Invoices by status</h3>
                 <div class="table-wrap">
-                    <table class="data">
+                    <table class="data data-wrap">
                         <thead><tr><th>Status</th><th>Count</th></tr></thead>
                         <tbody>
                         <tr th:each="entry : ${report.invoiceCounts}">
@@ -80,7 +80,7 @@
             <p class="muted" th:if="${table.empty}">No data for this report yet.</p>
 
             <div class="table-wrap" th:unless="${table.empty}">
-                <table class="data">
+                <table class="data data-wrap">
                     <thead>
                     <tr><th th:each="col : ${table.columns}" th:text="${col}">Column</th></tr>
                     </thead>

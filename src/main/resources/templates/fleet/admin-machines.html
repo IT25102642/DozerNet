@@ -21,7 +21,7 @@
         <p class="muted" th:if="${#lists.isEmpty(machines)}">No machines in the system yet.</p>
 
         <div class="table-wrap" th:unless="${#lists.isEmpty(machines)}">
-            <table class="data">
+            <table class="data data-wrap">
                 <thead>
                 <tr><th>Model</th><th>Type</th><th>Owner</th><th>Location</th><th>Rate</th><th>Status</th><th>Change status</th><th></th></tr>
                 </thead>
@@ -34,10 +34,10 @@
                         <span th:unless="${m.ownership.name() == 'COMPANY'}" th:text="${m.owner != null ? m.owner.fullName : 'Private'}">Owner</span>
                     </td>
                     <td th:text="${m.location}">Location</td>
-                    <td><span th:text="${currencySymbol}">Rs.</span> <span th:text="${#numbers.formatDecimal(m.dailyRate,1,'COMMA',2,'POINT')}">0</span></td>
-                    <td><span class="pill" th:classappend="${'pill-' + m.status.name().toLowerCase()}" th:text="${m.status.displayName}">Status</span></td>
+                    <td class="nw"><span th:text="${currencySymbol}">Rs.</span> <span th:text="${#numbers.formatDecimal(m.dailyRate,1,'COMMA',2,'POINT')}">0</span></td>
+                    <td class="nw"><span class="pill" th:classappend="${'pill-' + m.status.name().toLowerCase()}" th:text="${m.status.displayName}">Status</span></td>
                     <td>
-                        <form th:action="@{'/admin/machines/' + ${m.id} + '/status'}" method="post" style="display:flex;gap:.3rem">
+                        <form th:action="@{'/admin/machines/' + ${m.id} + '/status'}" method="post" class="row-actions" style="flex-wrap:nowrap">
                             <select class="select" name="status" style="padding:.35rem .5rem">
                                 <option th:each="s : ${statuses}" th:value="${s}" th:text="${s.displayName}"
                                         th:selected="${s == m.status}"></option>
@@ -45,12 +45,14 @@
                             <button class="btn btn-ghost btn-sm" type="submit">Set</button>
                         </form>
                     </td>
-                    <td style="display:flex;gap:.4rem">
+                    <td>
+                      <div class="row-actions">
                         <a class="btn btn-ghost btn-sm" th:href="@{'/admin/machines/' + ${m.id} + '/edit'}">Edit</a>
                         <form th:action="@{'/admin/machines/' + ${m.id} + '/delete'}" method="post"
                               onsubmit="return confirm('Delete this machine?')">
                             <button class="btn btn-danger btn-sm" type="submit">Delete</button>
                         </form>
+                      </div>
                     </td>
                 </tr>
                 </tbody>

@@ -24,15 +24,15 @@
         <p class="muted" th:if="${#lists.isEmpty(entries)}">Nothing recorded yet.</p>
 
         <div class="table-wrap" th:unless="${#lists.isEmpty(entries)}">
-            <table class="data">
+            <table class="data data-wrap">
                 <thead>
                 <tr><th>When</th><th>Who</th><th>Action</th><th>Record</th><th>Details</th></tr>
                 </thead>
                 <tbody>
                 <tr th:each="e : ${entries}">
-                    <td th:text="${#temporals.format(e.createdAt, 'dd MMM yyyy HH:mm')}">date</td>
+                    <td class="nw" th:text="${#temporals.format(e.createdAt, 'dd MMM yyyy HH:mm')}">date</td>
                     <td th:text="${e.actorLabel}">Who</td>
-                    <td><span class="pill" th:text="${e.action}">ACTION</span></td>
+                    <td class="nw"><span class="pill" th:text="${e.action}">ACTION</span></td>
                     <td>
                         <span th:text="${e.entityType}">Type</span>
                         <span class="muted" th:if="${e.entityId != null}" th:text="'#' + ${e.entityId}">#1</span>

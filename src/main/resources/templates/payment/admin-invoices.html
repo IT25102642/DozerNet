@@ -29,7 +29,7 @@
             <h3>Bookings awaiting invoice (recovery)</h3>
             <p class="muted">Invoices are normally created when a booking is approved. Use this only if one is missing.</p>
             <div class="table-wrap">
-                <table class="data">
+                <table class="data data-wrap">
                     <thead>
                     <tr><th>Customer</th><th>Machine</th><th>Dates</th><th>Total</th><th></th></tr>
                     </thead>
@@ -37,8 +37,8 @@
                     <tr th:each="b : ${pendingInvoices}">
                         <td th:text="${b.customer.fullName}">Customer</td>
                         <td th:text="${b.machine.model}">Machine</td>
-                        <td><span th:text="${b.startDate}">start</span> &rarr; <span th:text="${b.endDate}">end</span></td>
-                        <td><span th:text="${currencySymbol}">Rs.</span>
+                        <td><span class="nw" th:text="${b.startDate}">start</span> <span class="nw">&rarr; <span th:text="${b.endDate}">end</span></span></td>
+                        <td class="nw"><span th:text="${currencySymbol}">Rs.</span>
                             <span th:text="${#numbers.formatDecimal(b.totalAmount,1,'COMMA',2,'POINT')}">0</span></td>
                         <td>
                             <form th:action="@{'/admin/invoices/generate/' + ${b.id}}" method="post">
@@ -54,23 +54,23 @@
         <p class="muted" th:if="${#lists.isEmpty(invoices)}">No invoices yet.</p>
 
         <div class="table-wrap" th:unless="${#lists.isEmpty(invoices)}">
-            <table class="data">
+            <table class="data data-wrap">
                 <thead>
                 <tr><th>#</th><th>Customer</th><th>Machine</th><th>Issued</th><th>Amount</th><th>Paid</th><th>Balance</th><th>Status</th><th></th></tr>
                 </thead>
                 <tbody>
                 <tr th:each="inv : ${invoices}">
-                    <td th:text="${inv.reference}">INV-2026-00001</td>
+                    <td class="nw" th:text="${inv.reference}">INV-2026-00001</td>
                     <td th:text="${inv.customer.fullName}">Customer</td>
                     <td th:text="${inv.booking.machine.model}">Machine</td>
-                    <td th:text="${inv.issuedDate}">2026-01-01</td>
-                    <td><span th:text="${currencySymbol}">Rs.</span>
+                    <td class="nw" th:text="${inv.issuedDate}">2026-01-01</td>
+                    <td class="nw"><span th:text="${currencySymbol}">Rs.</span>
                         <span th:text="${#numbers.formatDecimal(inv.amount,1,'COMMA',2,'POINT')}">0</span></td>
-                    <td><span th:text="${currencySymbol}">Rs.</span>
+                    <td class="nw"><span th:text="${currencySymbol}">Rs.</span>
                         <span th:text="${#numbers.formatDecimal(inv.amountPaid,1,'COMMA',2,'POINT')}">0</span></td>
-                    <td><span th:text="${currencySymbol}">Rs.</span>
+                    <td class="nw"><span th:text="${currencySymbol}">Rs.</span>
                         <span th:text="${#numbers.formatDecimal(inv.balance,1,'COMMA',2,'POINT')}">0</span></td>
-                    <td><span class="pill" th:text="${inv.status}">UNPAID</span></td>
+                    <td class="nw"><span class="pill" th:text="${inv.status}">UNPAID</span></td>
                     <td><a class="btn btn-ghost btn-sm" th:href="@{'/admin/invoices/' + ${inv.id}}">Open</a></td>
                 </tr>
                 </tbody>
