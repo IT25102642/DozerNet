@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/common :: head('Book a machine')}"></head>
+<body>
+<nav th:replace="~{fragments/common :: navbar}"></nav>
+
+<section class="section">
+    <div class="container form-panel">
+        <a class="muted" th:href="@{'/machines/view/' + ${machine.id}}">&larr; Back to machine</a>
+        <h1>Book <span th:text="${machine.model}">Machine</span></h1>
+
+        <div class="alert alert-danger" th:if="${error}" th:text="${error}"></div>
+
+        <div class="card" style="margin-bottom:var(--space-3)">
+            <p class="muted" style="margin:0">
+                <strong th:text="${machine.type.displayName}">Type</strong> &middot;
+                <span th:text="${machine.location}">Location</span> &middot;
+                <span th:text="${currencySymbol}">Rs.</span>
+                <span th:text="${#numbers.formatDecimal(machine.dailyRate,1,'COMMA',2,'POINT')}">0</span>/day
+            </p>
+        </div>
+
+        <form class="card" th:action="@{'/bookings/new/' + ${machine.id}}" th:object="${bookingForm}" method="post" novalidate>
+            <div class="form-row">
+                <div class="field">
+                    <label for="startDate">Start date</label>
+                    <input class="input" id="startDate" type="date" th:field="*{startDate}"/>
+                    <div class="field-error" th:if="${#fields.hasErrors('startDate')}" th:errors="*{startDate}"></div>
+                </div>
+                <div class="field">
+                    <label for="endDate">End date</label>
+                    <input class="input" id="endDate" type="date" th:field="*{endDate}"/>
+                    <div class="field-error" th:if="${#fields.hasErrors('endDate')}" th:errors="*{endDate}"></div>
+                </div>
+            </div>
+
+            <div class="field" style="margin-top:var(--space-3)">
+                <label>Where will this machine work?</label>
+                <p class="muted" style="margin:.25rem 0 var(--space-2)">Pick the district, then add the site landmark or road.</p>
+                <input type="hidden" id="jobSiteDistrict" th:field="*{jobSiteDistrict}"/>
+                <div class="job-filter district-chips" role="group" aria-label="Job site district">
+                    <button type="button" class="job-filter-chip district-chip"
+                            th:each="d : ${districts}"
+                            th:text="${d}"
+                            th:attr="data-district=${d},aria-pressed=${bookingForm.jobSiteDistrict == d}"
+                            th:classappend="${bookingForm.jobSiteDistrict == d} ? ' is-active'">District</button>
+                </div>
+                <div class="field-error" th:if="${#fields.hasErrors('jobSiteDistrict')}" th:errors="*{jobSiteDistrict}"></div>
+            </div>
+
+            <div class="field">
+                <label for="jobSiteAddress">Site address / landmark</label>
+                <textarea class="textarea" id="jobSiteAddress" rows="2"
+                          th:field="*{jobSiteAddress}"
+                          placeholder="e.g. Near Kaduwela flyover, site gate B"></textarea>
+                <div class="field-error" th:if="${#fields.hasErrors('jobSiteAddress')}" th:errors="*{jobSiteAddress}"></div>
+            </div>
+
+            <!-- One job often needs several machines; each gets its own booking and invoice. -->
+            <div class="field" th:unless="${#lists.isEmpty(otherMachines)}">
+                <label for="alsoMachineIds">Need anything else for the same job? (optional)</label>
+                <p class="muted" style="margin:.25rem 0 var(--space-2)">
+                    Hold Ctrl (Cmd on Mac) to pick more than one. They share these dates and job site.
+                </p>
+                <select class="select" id="alsoMachineIds" name="alsoMachineIds" multiple size="5">
+                    <option th:each="m : ${otherMachines}" th:value="${m.id}"
+                            th:text="${m.model} + ' (' + ${m.type.displayName} + ') — ' + ${currencySymbol} + ' '
+                                     + ${#numbers.formatDecimal(m.dailyRate,1,'COMMA',2,'POINT')} + '/day'">Machine</option>
+                </select>
+            </div>
+
+            <p class="muted" id="estimate" style="display:none">Estimated total: <strong id="estimateValue"></strong></p>
+            <p class="muted">
+                Transport to the job site and 18% VAT are added to your invoice once the booking is approved.
+            </p>
+            <button class="btn btn-primary" type="submit">Request booking</button>
+        </form>
+    </div>
+</section>
+
+<footer th:replace="~{fragments/common :: footer}"></footer>
+<script th:inline="javascript">
+    (function () {
+        const today = new Date().toISOString().split('T')[0];
+        const start = document.getElementById('startDate');
+        const end = document.getElementById('endDate');
+        start.min = today; end.min = today;
+        const rate = /*[[${machine.dailyRate}]]*/ 0;
+        const symbol = /*[[${currencySymbol}]]*/ 'Rs.';
+        const est = document.getElementById('estimate');
+        const estVal = document.getElementById('estimateValue');
+        function recalc() {
+            if (start.value) end.min = start.value;
+            if (start.value && end.value) {
+                const s = new Date(start.value), e = new Date(end.value);
+                const days = Math.floor((e - s) / 86400000) + 1;
+                if (days > 0) {
+                    est.style.display = 'block';
+                    estVal.textContent = symbol + ' ' + (days * rate).toLocaleString() + ' (' + days + ' day' + (days > 1 ? 's' : '') + ')';
+                    return;
+                }
+            }
+            est.style.display = 'none';
+        }
+        start.addEventListener('change', recalc);
+        end.addEventListener('change', recalc);
+        recalc();
+
+        const districtInput = document.getElementById('jobSiteDistrict');
+        const chips = document.querySelectorAll('.district-chip');
+        chips.forEach(function (chip) {
+            chip.addEventListener('click', function () {
+                const value = chip.getAttribute('data-district');
+                districtInput.value = value;
+                chips.forEach(function (c) {
+                    const on = c === chip;
+                    c.classList.toggle('is-active', on);
+                    c.setAttribute('aria-pressed', on ? 'true' : 'false');
+                });
+            });
+        });
+    })();
+</script>
+</body>
+</html>

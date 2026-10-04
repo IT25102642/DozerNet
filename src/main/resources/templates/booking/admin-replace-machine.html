@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/common :: head('Replace machine')}"></head>
+<body>
+<nav th:replace="~{fragments/common :: navbar}"></nav>
+<div th:replace="~{fragments/common :: flash}"></div>
+
+<section class="section">
+    <div class="container">
+        <div class="page-head">
+            <div>
+                <p class="eyebrow">Admin &middot; Bookings</p>
+                <h1>Replace the booked machine</h1>
+            </div>
+            <a class="btn btn-ghost" th:href="@{/admin/bookings}">Back to bookings</a>
+        </div>
+
+        <div class="card" style="margin-bottom:1rem">
+            <h3 style="margin-top:0">Current booking</h3>
+            <p>
+                <strong th:text="${booking.customer.fullName}">Customer</strong> &middot;
+                <span th:text="${booking.machine.model}">Machine</span>
+                (<span th:text="${booking.machine.registrationNumber}">REG</span>)<br/>
+                <span class="muted">
+                    <span th:text="${booking.startDate}">start</span> &rarr;
+                    <span th:text="${booking.endDate}">end</span> &middot;
+                    <span th:text="${booking.jobSiteLabel}">Job site</span>
+                </span>
+            </p>
+        </div>
+
+        <form th:action="@{'/admin/bookings/' + ${booking.id} + '/replace'}" method="post" class="card">
+            <label for="replacementMachineId">Replacement machine</label>
+            <select class="select" id="replacementMachineId" name="replacementMachineId" required>
+                <option value="">Choose an available machine&hellip;</option>
+                <option th:each="m : ${machines}" th:value="${m.id}"
+                        th:text="${m.model} + ' (' + ${m.registrationNumber} + ') — ' + ${currencySymbol} + ' ' + ${#numbers.formatDecimal(m.dailyRate,1,'COMMA',2,'POINT')} + '/day'">
+                    Machine
+                </option>
+            </select>
+
+            <label for="reason" style="margin-top:.8rem">Reason for the change</label>
+            <input class="input" type="text" id="reason" name="reason" required maxlength="500"
+                   placeholder="e.g. Hydraulic fault found during pre-hire check"/>
+
+            <p class="muted" style="margin-top:.8rem">
+                The customer is notified automatically. An invoice that has not been paid yet is
+                re-priced for the new machine; a paid invoice is left unchanged.
+            </p>
+
+            <div style="margin-top:1rem;display:flex;gap:.5rem">
+                <button class="btn btn-primary" type="submit">Replace machine</button>
+                <a class="btn btn-ghost" th:href="@{/admin/bookings}">Cancel</a>
+            </div>
+        </form>
+
+        <div th:unless="${#lists.isEmpty(history)}" style="margin-top:1.5rem">
+            <h3>Replacement history</h3>
+            <div class="table-wrap">
+                <table class="data">
+                    <thead>
+                    <tr><th>When</th><th>From</th><th>To</th><th>Reason</th><th>By</th></tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="h : ${history}">
+                        <td th:text="${#temporals.format(h.createdAt, 'dd MMM yyyy HH:mm')}">date</td>
+                        <td th:text="${h.previousMachine.model}">old</td>
+                        <td th:text="${h.replacementMachine.model}">new</td>
+                        <td th:text="${h.reason}">reason</td>
+                        <td th:text="${h.replacedBy != null ? h.replacedBy.fullName : 'System'}">admin</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>
+
+<footer th:replace="~{fragments/common :: footer}"></footer>
+</body>
+</html>

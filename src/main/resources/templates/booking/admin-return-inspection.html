@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/common :: head('Return inspection')}"></head>
+<body>
+<nav th:replace="~{fragments/common :: navbar}"></nav>
+<div th:replace="~{fragments/common :: flash}"></div>
+
+<section class="section">
+    <div class="container">
+        <div class="page-head">
+            <div>
+                <p class="eyebrow">Admin &middot; Bookings</p>
+                <h1>Return inspection</h1>
+            </div>
+            <a class="btn btn-ghost" th:href="@{/admin/bookings}">Back to bookings</a>
+        </div>
+
+        <div class="card" style="margin-bottom:1rem">
+            <p style="margin:0">
+                <strong th:text="${booking.machine.model}">Machine</strong>
+                (<span th:text="${booking.machine.registrationNumber}">REG</span>)
+                returned by <strong th:text="${booking.customer.fullName}">Customer</strong><br/>
+                <span class="muted">
+                    <span th:text="${booking.startDate}">start</span> &rarr;
+                    <span th:text="${booking.endDate}">end</span> &middot;
+                    <span th:text="${booking.jobSiteLabel}">Job site</span>
+                </span>
+            </p>
+        </div>
+
+        <!-- Already filed: show the report read-only -->
+        <div class="card" th:if="${existing != null}">
+            <h3 style="margin-top:0">Inspection already on file</h3>
+            <p><strong>Notes:</strong> <span th:text="${existing.notes}">notes</span></p>
+            <p>
+                <strong>Damage:</strong>
+                <span th:text="${existing.damageReported} ? 'Yes' : 'None reported'">No</span>
+            </p>
+            <th:block th:if="${existing.damageReported}">
+                <p><strong>Details:</strong> <span th:text="${existing.damageDescription}">details</span></p>
+                <p><strong>Responsible:</strong> <span th:text="${existing.responsibleParty.displayName}">party</span></p>
+                <p th:if="${existing.estimatedRepairCost != null}">
+                    <strong>Estimated repair:</strong>
+                    <span th:text="${currencySymbol}">Rs.</span>
+                    <span th:text="${#numbers.formatDecimal(existing.estimatedRepairCost,1,'COMMA',2,'POINT')}">0</span>
+                </p>
+            </th:block>
+            <p th:if="${existing.photo != null}">
+                <a class="btn btn-ghost btn-sm" th:href="@{'/documents/' + ${existing.photo.id}}" target="_blank">
+                    View inspection photo
+                </a>
+            </p>
+        </div>
+
+        <!-- Not yet filed: the form -->
+        <form th:if="${existing == null}" class="card"
+              th:action="@{'/admin/bookings/' + ${booking.id} + '/inspection'}"
+              th:object="${inspectionForm}" method="post" enctype="multipart/form-data">
+
+            <label for="notes">Inspection notes</label>
+            <textarea class="input" id="notes" th:field="*{notes}" rows="3" required maxlength="1000"
+                      placeholder="Condition on return, fuel level, hours logged, accessories returned&hellip;"></textarea>
+            <p class="field-error" th:if="${#fields.hasErrors('notes')}" th:errors="*{notes}"></p>
+
+            <label style="display:flex;align-items:center;gap:.5rem;margin-top:.9rem">
+                <input type="checkbox" th:field="*{damageReported}"/>
+                Damage was found
+            </label>
+
+            <label for="damageDescription" style="margin-top:.8rem">Damage description</label>
+            <textarea class="input" id="damageDescription" th:field="*{damageDescription}" rows="2" maxlength="1000"
+                      placeholder="Required when damage is reported"></textarea>
+            <p class="field-error" th:if="${#fields.hasErrors('damageDescription')}" th:errors="*{damageDescription}"></p>
+
+            <label for="responsibleParty" style="margin-top:.8rem">Responsible party</label>
+            <select class="select" id="responsibleParty" th:field="*{responsibleParty}">
+                <option th:each="p : ${responsibleParties}" th:value="${p}" th:text="${p.displayName}">party</option>
+            </select>
+
+            <label for="estimatedRepairCost" style="margin-top:.8rem">Estimated repair cost (optional)</label>
+            <input class="input" type="number" step="0.01" min="0" id="estimatedRepairCost"
+                   th:field="*{estimatedRepairCost}" placeholder="0.00"/>
+            <p class="field-error" th:if="${#fields.hasErrors('estimatedRepairCost')}" th:errors="*{estimatedRepairCost}"></p>
+
+            <label for="photo" style="margin-top:.8rem">Photo (optional, JPG/PNG/PDF, max 5&nbsp;MB)</label>
+            <input class="input" type="file" id="photo" name="photo" accept="image/jpeg,image/png,image/webp,application/pdf"/>
+
+            <div style="margin-top:1rem;display:flex;gap:.5rem">
+                <button class="btn btn-primary" type="submit">File inspection</button>
+                <a class="btn btn-ghost" th:href="@{/admin/bookings}">Cancel</a>
+            </div>
+        </form>
+    </div>
+</section>
+
+<footer th:replace="~{fragments/common :: footer}"></footer>
+</body>
+</html>
