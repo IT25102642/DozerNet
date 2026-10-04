@@ -27,7 +27,7 @@
         <p class="muted" th:if="${#lists.isEmpty(bookings)}">No bookings to show.</p>
 
         <div class="table-wrap" th:unless="${#lists.isEmpty(bookings)}">
-            <table class="data">
+            <table class="data data-wrap">
                 <thead>
                 <tr><th>Customer</th><th>Machine</th><th>Job site</th><th>Dates</th><th>Days</th><th>Total</th><th>Status</th><th>Actions</th></tr>
                 </thead>
@@ -42,11 +42,12 @@
                         <strong th:text="${b.jobSiteDistrict}">District</strong><br/>
                         <span class="muted" th:text="${b.jobSiteAddress}">Address</span>
                     </td>
-                    <td><span th:text="${b.startDate}">start</span> &rarr; <span th:text="${b.endDate}">end</span></td>
-                    <td th:text="${b.days}">1</td>
-                    <td><span th:text="${currencySymbol}">Rs.</span> <span th:text="${#numbers.formatDecimal(b.totalAmount,1,'COMMA',2,'POINT')}">0</span></td>
-                    <td><span class="pill" th:classappend="${'pill-' + b.status.name().toLowerCase()}" th:text="${b.status.displayName}">Status</span></td>
-                    <td style="display:flex;gap:.4rem;flex-wrap:wrap">
+                    <td><span class="nw" th:text="${b.startDate}">start</span> <span class="nw">&rarr; <span th:text="${b.endDate}">end</span></span></td>
+                    <td class="nw" th:text="${b.days}">1</td>
+                    <td class="nw"><span th:text="${currencySymbol}">Rs.</span> <span th:text="${#numbers.formatDecimal(b.totalAmount,1,'COMMA',2,'POINT')}">0</span></td>
+                    <td class="nw"><span class="pill" th:classappend="${'pill-' + b.status.name().toLowerCase()}" th:text="${b.status.displayName}">Status</span></td>
+                    <td>
+                      <div class="row-actions">
                         <th:block th:if="${b.status.name() == 'PENDING'}">
                             <form th:action="@{'/admin/bookings/' + ${b.id} + '/approve'}" method="post">
                                 <button class="btn btn-primary btn-sm" type="submit">Approve</button>
@@ -73,6 +74,7 @@
                         <span class="muted"
                               th:if="${b.status.name() != 'PENDING' and b.status.name() != 'APPROVED'
                                        and (needsInspection == null or !needsInspection.contains(b.id))}">&mdash;</span>
+                      </div>
                     </td>
                 </tr>
                 </tbody>

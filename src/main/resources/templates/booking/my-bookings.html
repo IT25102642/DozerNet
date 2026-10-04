@@ -18,7 +18,7 @@
         <p class="muted" th:if="${#lists.isEmpty(bookings)}">You have no bookings yet.</p>
 
         <div class="table-wrap" th:unless="${#lists.isEmpty(bookings)}">
-            <table class="data">
+            <table class="data data-wrap">
                 <thead>
                 <tr><th>Machine</th><th>Job site</th><th>Dates</th><th>Days</th><th>Total</th><th>Status</th><th></th></tr>
                 </thead>
@@ -29,11 +29,12 @@
                         <strong th:text="${b.jobSiteDistrict}">District</strong><br/>
                         <span class="muted" th:text="${b.jobSiteAddress}">Address</span>
                     </td>
-                    <td><span th:text="${b.startDate}">start</span> &rarr; <span th:text="${b.endDate}">end</span></td>
-                    <td th:text="${b.days}">1</td>
-                    <td><span th:text="${currencySymbol}">Rs.</span> <span th:text="${#numbers.formatDecimal(b.totalAmount,1,'COMMA',2,'POINT')}">0</span></td>
-                    <td><span class="pill" th:classappend="${'pill-' + b.status.name().toLowerCase()}" th:text="${b.status.displayName}">Status</span></td>
+                    <td><span class="nw" th:text="${b.startDate}">start</span> <span class="nw">&rarr; <span th:text="${b.endDate}">end</span></span></td>
+                    <td class="nw" th:text="${b.days}">1</td>
+                    <td class="nw"><span th:text="${currencySymbol}">Rs.</span> <span th:text="${#numbers.formatDecimal(b.totalAmount,1,'COMMA',2,'POINT')}">0</span></td>
+                    <td class="nw"><span class="pill" th:classappend="${'pill-' + b.status.name().toLowerCase()}" th:text="${b.status.displayName}">Status</span></td>
                     <td>
+                      <div class="row-actions">
                         <form th:if="${b.status.name() == 'PENDING'
                                       or (b.status.name() == 'APPROVED' and unpaidInvoices != null and unpaidInvoices.containsKey(b.id))}"
                               th:action="@{'/bookings/' + ${b.id} + '/cancel'}" method="post"
@@ -43,6 +44,7 @@
                         <a class="btn btn-primary btn-sm"
                            th:if="${unpaidInvoices != null and unpaidInvoices.containsKey(b.id)}"
                            th:href="@{'/customer/invoices/' + ${unpaidInvoices.get(b.id)} + '/pay'}">Pay now</a>
+                      </div>
                     </td>
                 </tr>
                 </tbody>

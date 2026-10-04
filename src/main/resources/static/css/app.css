@@ -877,6 +877,11 @@ table.data { width: 100%; border-collapse: collapse; font-size: .92rem; }
 table.data th, table.data td { padding: .8rem 1rem; text-align: left; border-bottom: 1px solid var(--line); white-space: nowrap; }
 table.data th { font-weight: 600; color: var(--ink-soft); font-size: .78rem; text-transform: uppercase; letter-spacing: .06em; background: #fafafa; }
 table.data tr:last-child td { border-bottom: none; }
+/* Wide admin tables: let long text wrap so the action buttons stay inside the card. */
+table.data.data-wrap th, table.data.data-wrap td { white-space: normal; padding: .75rem .7rem; vertical-align: middle; }
+table.data.data-wrap td.nw, table.data.data-wrap th.nw, table.data.data-wrap td .nw { white-space: nowrap; }
+.row-actions { display: flex; gap: .4rem; flex-wrap: wrap; align-items: center; }
+.row-actions form { margin: 0; }
 table.data tbody tr:hover, table.data tr:hover { background: #fbfbfc; }
 
 /* ---------- Status pills ---------- */
