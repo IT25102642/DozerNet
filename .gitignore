@@ -23,8 +23,8 @@ application-local.properties
 # OS
 Thumbs.db
 
-# Spec documents (kept out of the code repo)
-docs/spec/
+# Docs folder: personal viva notes, specs (kept out of the code repo)
+docs/
 
 # Environment secrets
 .env
